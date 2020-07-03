@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, RefreshControl, FlatList, ActivityIndicator, Button, Animated, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, RefreshControl, SectionList, FlatList, ActivityIndicator, Button, Animated, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
 import store from '../../store'
 import { connect } from 'react-redux'
 /* colors */
@@ -12,13 +12,15 @@ import { Header } from 'react-navigation';
 import Toast from 'react-native-simple-toast';
 /* component */
 import Product from '../../components/Product/Product'
+import CategoryItem from '../../components/CategoryItem/CategoryItem'
 class MainCategory extends React.Component {
     state = {
         counter: this.props.cartReducer.length,
 
         categoryName: "",
         searchWord: "",
-        categoryArr: []
+        categoryArr: [],
+        bestSellerProducts: []
 
     };
 
@@ -28,11 +30,31 @@ class MainCategory extends React.Component {
         this.props.navigation.navigate("productInfo", { item: item, counter: this.state.counter })
 
     }
+    handleCartAddOne(item) {
+        this.props.setCart({
+            item: item, count: 1,
+        })
+        Toast.show(`${item.productNameEN} added to cart`);
+
+    }
+    handleLike(bool, item) {
+        console.log(bool);
+
+        console.log("liked");
+        console.log(item.id);
+
+
+    }
     componentDidMount() {
         this.unsubscribe = store.subscribe(() => {
             this.setState({ counter: this.props.cartReducer.length })
 
         });
+        console.log(this.props.navigation.state.params.props.item.category);
+        this.setState({ bestSellerProducts: this.props.bestsellerReducer }, (() => { this.setState({ isDataLoaded: true }) }))
+        this.setState({ categoryArr: this.props.navigation.state.params.props.item.category }, (() => { this.setState({ isDataLoaded: true }) }))
+
+
     }
     componentWillUnmount() {
         this.unsubscribe();
@@ -56,6 +78,12 @@ class MainCategory extends React.Component {
         this.setState({ searchWord: text })
         console.log(this.state.searchWord);
 
+    }
+    navigateSubCategory(item,mainCategory) {
+      this.props.navigation.navigate("SubCategory", { items: item,mainCategory:mainCategory })
+
+           
+            
     }
     _subCategoryItem = ({ item }) => (
         <TouchableOpacity style={styles.gridCell}>
@@ -126,19 +154,87 @@ class MainCategory extends React.Component {
                     </View>
 
                 </View>
-                
+
                 {this.state.searchWord == "" && (
                     <View style={styles.mainContainer}>
 
-                        <View style={styles.horizontalScrollController}>
-                            <FlatList style={styles.horizontalScroll}
-                                horizontal={true} showsHorizontalScrollIndicator={false} pagingEnabled={false}
+                        <View style={{ alignItems: 'center' }}>
 
+                            <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * 15 / 812 }}></View>
 
-                                renderItem={this._subCategoryItem}
+                            <SectionList
+                                ListHeaderComponent={this._headerItem}
 
+                                // key={item => { item.id }}
+                                // ItemSeparatorComponent = { (<View><Text>asdf</Text></View>) }
+                                showsVerticalScrollIndicator={false}
+                                contentContainerStyle={styles.grid}
+                                sections={[
+                                    { title: "BEST SELLER", data: this.state.categoryArr },
+                                    { title: "DISCOVER", data: this.state.bestSellerProducts },]}
+                                renderSectionHeader={({ section: { title } }) => (
+                                    <View style={styles.textView}>
+                                        <Text style={styles.titleText}>{title}</Text>
+                                    </View>
+                                )}
+                                initialNumToRender={30}
+                                renderItem={({ item, index }) =>
+                                    !item.name ?
+                                        index % 2 == 0 &&
+                                        <View style={{ flexDirection: 'row' }}>
+                                            <Product
+                                                handlePress={() => this.handlePress(this.state.bestSellerProducts[index])}
+                                                handleLike={(e) => { this.handleLike(e, this.state.bestSellerProducts[index]) }}
+                                                handleCartAddOne={() => this.handleCartAddOne(this.state.bestSellerProducts[index])}
+                                                src={this.state.bestSellerProducts[index]}
+                                            />
+                                            {this.state.bestSellerProducts[index + 1] &&
+                                                <Product
+                                                    handlePress={() => this.handlePress(this.state.bestSellerProducts[index + 1])}
+                                                    handleLike={(e) => { this.handleLike(e, this.state.bestSellerProducts[index + 1]) }}
+                                                    handleCartAddOne={() => this.handleCartAddOne(this.state.bestSellerProducts[index + 1])}
+                                                    src={this.state.bestSellerProducts[index + 1]}
+                                                />}
+                                        </View>
+                                        :
+                                        index % 3 == 0 &&
+                                        <View style={{ flexDirection: 'row' }}>
+
+                                            <CategoryItem
+                                                click={() => this.navigateSubCategory(this.state.categoryArr[index],this.props.navigation.state.params.props.item.mainCategory)}
+                                                src={this.state.categoryArr[index]}
+                                            />
+                                            {this.state.categoryArr[index + 1] &&
+                                                <CategoryItem
+                                                    click={() => this.navigateSubCategory(this.state.categoryArr[index+1],this.props.navigation.state.params.props.item.mainCategory)}
+                                                    src={this.state.categoryArr[index+1]}
+                                                />}
+                                            {this.state.categoryArr[index + 2] &&
+                                                <CategoryItem
+                                                    click={() => this.navigateSubCategory(this.state.categoryArr[index+2],this.props.navigation.state.params.props.item.mainCategory)}
+                                                    src={this.state.categoryArr[index+2]}
+                                                />
+                                            }
+                                        </View>
+
+                                }
+                                refreshControl={
+                                    <RefreshControl
+                                        refreshing={this.state.refreshing}
+                                        onRefresh={this.onRefresh}
+                                    />
+                                }
+                                style={{ width: '100%' }}
+                                keyExtractor={(item, index) => index}
+                                horizontal={false}
+                            // numColumns={2}
                             >
-                            </FlatList>
+                                {/* <RefreshControl  refreshing={this.state.refreshing} onRefresh={()=>this.onRefresh()} /> */}
+
+                            </SectionList>
+
+
+
                         </View>
 
 
@@ -380,12 +476,47 @@ const styles = StyleSheet.create({
     horizontalScrollController: {
         height: Dimensions.get('window').height * 95 * 2.3 / 812,
     },
+    titleText: {
+        marginLeft: Dimensions.get('window').width * 15 / 375,
+        fontFamily: 'Cairo-Bold',
+        fontSize: 20
+    },
+    textView: {
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+        width: Dimensions.get('window').width - 100,
+        marginRight: 100,
+
+    },
+    imageThumbnail: {
+
+        height: 50,
+        width: 50,
+    },
+    gridCell: {
+        width: Dimensions.get('window').width * 106 * .95 / 375,
+        height: Dimensions.get('window').height * 95 * .95 / 812,
+        borderRadius: 15,
+        margin: 5,
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        backgroundColor: colors.white,
+
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+
+        elevation: 2,
+    },
 
 });
 const mapStateToProps = state => ({
-    www: state.www,
     cartReducer: state.cartReducer,
-    productsReducer: state.productsReducer
+    bestsellerReducer: state.bestsellerReducer,
 })
 const mapDispatchToProps = {
     setCart,

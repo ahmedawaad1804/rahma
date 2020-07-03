@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, RefreshControl, FlatList, ActivityIndicator, Button, Animated, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, RefreshControl, FlatList, ActivityIndicator, Button, Animated, SectionList, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
 import store from '../../store'
 import { connect } from 'react-redux'
 /* colors */
@@ -11,24 +11,22 @@ import Product from '../../components/Product/Product'
 /* padge */
 import { Avatar, Badge, Icon, withBadge } from 'react-native-elements'
 /* action */
-import { refreshtProducts, firstGetProducts } from '../../actions/product'
+import { refreshtProducts, firstGetProducts, setCart } from '../../actions/product'
 /* services */
 import dataService from '../../services/dataService'
 /* adv */
 import Adv from '../../components/Ads/Ads'
 /* main category item */
-import MainCategory from '../../components/MainCategory/MainCategory'
+// import MainCategory from '../../components/MainCategory/MainCategory'
+import MainCategoryItem from '../../components/MainCategoryItem/MainCategoryItem'
+
 /* toast */
 import Toast from 'react-native-simple-toast';
 /* pagination */
 import Carousel from 'react-native-snap-carousel';
-const SLIDER_WIDTH = Dimensions.get('window').width;
-const ITEM_WIDTH = Math.round(SLIDER_WIDTH * 0.7);
-const ITEM_HEIGHT = Math.round(ITEM_WIDTH * 3 / 4);
-const DATA = [];
-for (let i = 0; i < 10; i++) {
-  DATA.push(i)
-}
+
+
+
 
 class Home extends React.Component {
 
@@ -39,22 +37,28 @@ class Home extends React.Component {
 
 
   state = {
+    temprender: null,
     dataSource: {},
     borderRadius: 40,
     refreshing: false,
     data: [
-      { key: "../../assets/ph.png" },
-      { key: "../../assets/ph.png" },
-      { key: "../../assets/ph.png" },
-      { key: "../../assets/ph.png" },
-      { key: "../../assets/ph.png" },
-      { key: "../../assets/ph.png" },
-      { key: "../../assets/ph.png" },
-      { key: "../../assets/ph.png" },
+      { key: 'Supermarket' },
+      { key: 'Pastry' },
+      { key: 'Mini Market' },
+      { key: 'Beauty' },
+      { key: 'f' },
+      { key: 'a' },
+      { key: '4' },
+      { key: 'q' },
+      { key: '5' },
+      { key: 'w' },
+      { key: '88' },
+
+
     ],
     categoryFalg: false,
     bestSeller: [],
-    itemData: [],
+    bestSellerProducts: [],
     isDataLoaded: false,
     test: null,
     count: 0,
@@ -74,9 +78,12 @@ class Home extends React.Component {
       // Some DOM api calls.
     });
 
-    this.setState({ itemData: this.props.productsReducer }, (() => { this.setState({ isDataLoaded: true }) }))
+    this.setState({ bestSellerProducts: this.props.bestsellerReducer }, (() => { this.setState({ isDataLoaded: true }) }))
 
-
+    // console.log(this.props.categoryReducer);
+    let temp = []
+    this.props.categoryReducer.map(category => temp.push(category.mainCategory))
+    this.setState({ data: temp })
   }
 
 
@@ -85,7 +92,7 @@ class Home extends React.Component {
     this.setState({ refreshing: true })
     this.props.refreshtProducts()
     this.setState({ refreshing: false })
-    this.setState({ itemData: this.props.productsReducer })
+    this.setState({ bestSellerProducts: this.props.bestsellerReducer })
 
   }
   //   getEvent(event) {
@@ -93,15 +100,30 @@ class Home extends React.Component {
   // if(event.nativeEvent.contentOffset.y>30){this.setState({borderRadius:0})}
   // if(event.nativeEvent.contentOffset.y<20){this.setState({borderRadius:40})}
   //   }
-  navigateMainCategory(title) {
+  navigateMainCategory(title, props) {
     // console.log("pressed");
 
-    this.props.navigation.navigate("MainCategory", { title })
+    this.props.navigation.navigate("MainCategory", { title, props })
 
   }
 
   handlePress(item) {
     this.props.navigation.navigate("productInfo", { item: item })
+
+  }
+  handleCartAddOne(item) {
+    this.props.setCart({
+      item: item, count: 1,
+    })
+    Toast.show(`${item.productNameEN} added to cart`);
+
+  }
+  handleLike(bool, item) {
+    console.log(bool);
+
+    console.log("liked");
+    console.log(item.id);
+
 
   }
   _handleSearchButton() {
@@ -120,21 +142,17 @@ class Home extends React.Component {
 
     let i = 0;
     if (text != "") {
-      // this.setState({ searchWord: text })
-      for (let item of this.props.productsReducer) {
-        if (item.productNameEN.includes(text) || item.productNameAR.includes(text)) {
-          temp.push(item);
-          i++;
-        }
-        if (i > 5) {
-          break
-        }
+      dataService.search(text).then(response => {
+        this.setState({ searchData: response.data }, () => {
+          this.setState({ _isSearch: true })
+
+        })
       }
-
-      this.setState({ searchData: temp }, () => {
-        this.setState({ _isSearch: true })
-
+      ).catch(err => {
+        console.log(err);
       })
+
+
     }
     else {
       this.setState({ _isSearch: false })
@@ -143,9 +161,9 @@ class Home extends React.Component {
 
 
   }
-  // shouldComponentUpdate() {
-  //   return false
-  // }
+
+
+
   _render = ({ item }) =>
 
     (
@@ -171,91 +189,43 @@ class Home extends React.Component {
           itemWidth={Dimensions.get('window').width * 343 / 375}
           onSnapToItem={(index) => { this.setState({ index }); }}
           autoplay={true}
-          autoplayInterval={2000}
-          loop={true}
+          autoplayInterval={4000}
+        // loop={true}
         />
         <Text style={styles.titleText}>Discover</Text>
       </View>
       <View style={styles.horizontalScrollController}>
-        <ScrollView style={styles.horizontalScroll}
-          horizontal={true} showsHorizontalScrollIndicator={false} pagingEnabled={false}
-        >
-          <View style={styles.grid}>
-            <View style={styles.gridRow}>
-              <TouchableOpacity style={styles.gridCell} onPress={() => this.navigateMainCategory("Supermarket")} >
-                <Image style={styles.imageThumbnail, { width: 126 / 3, height: 108 / 3 }} source={require("../../assets/categories/supermarket.png")} />
-                <Text style={styles.smallText}>Supermarket</Text>
-                <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * 12 / 812 }}></View>
 
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.gridCell} onPress={() => this.navigateMainCategory("Pastry")}>
-                <Image style={styles.imageThumbnail, { width: 141 / 3, height: 118 / 3 }} source={require("../../assets/categories/pastry.png")} />
-                <Text style={styles.smallText}>Pastry</Text>
-                <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * 12 / 812 }}></View>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.gridCell}>
-                <Image style={styles.imageThumbnail, { width: 141 / 3, height: 118 / 3 }} source={require("../../assets/categories/mini-market.png")} />
-                <Text style={styles.smallText}>Mini Market</Text>
-                <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * 12 / 812 }}></View>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.gridCell}>
-                <Image style={styles.imageThumbnail, { width: 141 / 3, height: 118 / 3 }} source={require("../../assets/categories/mini-market.png")} />
-                <Text style={styles.smallText}>Mini Market</Text>
-                <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * 12 / 812 }}></View>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.gridCell}>
-                <Image style={styles.imageThumbnail, { width: 141 / 3, height: 118 / 3 }} source={require("../../assets/categories/mini-market.png")} />
-                <Text style={styles.smallText}>Mini Market</Text>
-                <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * 12 / 812 }}></View>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.gridCell}>
-                <Image style={styles.imageThumbnail, { width: 141 / 3, height: 118 / 3 }} source={require("../../assets/categories/mini-market.png")} />
-                <Text style={styles.smallText}>Mini Market</Text>
-                <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * 12 / 812 }}></View>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.gridRow}>
-              <TouchableOpacity style={styles.gridCell}>
-                <Image style={styles.imageThumbnail, { width: 108 / 3, height: 109 / 3 }} source={require("../../assets/categories/pizzeria.png")} />
-                <Text style={styles.smallText}>Pizzeria</Text>
-                <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * 12 / 812 }}></View>
+        {/* onPress={() => this.navigateMainCategory(`${this.props.categoryReducer[index].mainCategory}`, { item: this.props.categoryReducer[index] })} */}
+        <FlatList
+          data={this.props.categoryReducer}
+          style={styles.horizontalScroll}
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          renderItem={({ item, index }) => (
+            index % 2 == 0 &&
+            <View >
+              <MainCategoryItem
+                click={() => this.navigateMainCategory(`${this.props.categoryReducer[index].mainCategory}`, { item: this.props.categoryReducer[index] })}
+                src={this.props.categoryReducer[index]} />
+              {this.props.categoryReducer[index + 1] &&
+                <MainCategoryItem
+                  click={() => this.navigateMainCategory(`${this.props.categoryReducer[index + 1].mainCategory}`, { item: this.props.categoryReducer[index + 1] })}
 
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.gridCell}>
-                <Image style={styles.imageThumbnail, { width: 109 / 3, height: 108 / 3 }} source={require("../../assets/categories/grocery.png")} />
-                <Text style={styles.smallText}>Grocery</Text>
-                <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * 12 / 812 }}></View>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.gridCell}>
-                <Image style={styles.imageThumbnail, { width: 108 / 3, height: 109 / 3 }} source={require("../../assets/categories/beauty.png")} />
-                <Text style={styles.smallText}>Beauty</Text>
-                <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * 12 / 812 }}></View>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.gridCell}>
-                <Image style={styles.imageThumbnail, { width: 108 / 3, height: 109 / 3 }} source={require("../../assets/categories/beauty.png")} />
-                <Text style={styles.smallText}>Beauty</Text>
-                <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * 12 / 812 }}></View>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.gridCell}>
-                <Image style={styles.imageThumbnail, { width: 108 / 3, height: 109 / 3 }} source={require("../../assets/categories/beauty.png")} />
-                <Text style={styles.smallText}>Beauty</Text>
-                <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * 12 / 812 }}></View>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.gridCell}>
-                <Image style={styles.imageThumbnail, { width: 108 / 3, height: 109 / 3 }} source={require("../../assets/categories/beauty.png")} />
-                <Text style={styles.smallText}>Beauty</Text>
-                <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * 12 / 812 }}></View>
-              </TouchableOpacity>
+                  src={this.props.categoryReducer[index + 1]} />}
             </View>
 
 
+          )}
+        />
 
-          </View>
-        </ScrollView>
+
+
+
       </View>
-      <View style={styles.textView}>
+      {/* <View style={styles.textView}>
         <Text style={styles.titleText}>BEST SELLERS</Text>
-      </View>
+      </View> */}
     </View>
   )
   render() {
@@ -270,7 +240,7 @@ class Home extends React.Component {
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingRight: Dimensions.get('window').width * 18 / 375 }}>
               <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
-              onPress={()=>{this.props.navigation.navigate("Cart")}}>
+                onPress={() => { this.props.navigation.navigate("Cart") }}>
                 <Image source={require("../../assets/icons/cart.png")}
                   style={styles.cartImageStyle} />
                 {this.state.count > 0 ? (<Badge
@@ -330,31 +300,47 @@ class Home extends React.Component {
               <View style={{ alignItems: 'center' }}>
 
 
-                <FlatList
+                <SectionList
                   ListHeaderComponent={this._headerItem}
-                  // ItemSeparatorComponent={(item,index) => {
 
-                  //   if(this.state.categoryFalg){
-                  //   return <View style={styles.textView}>
-                  //   <Text style={styles.titleText}>BEST SELLERS</Text>
-                  // </View>}
-                  // return false
-                  // }
-                  // }
-                  key={item => { item.id }}
+                  // key={item => { item.id }}
                   // ItemSeparatorComponent = { (<View><Text>asdf</Text></View>) }
                   showsVerticalScrollIndicator={false}
                   contentContainerStyle={styles.grid}
-                  data={this.state.itemData}
+                  sections={[{ title: "BEST SELLER", data: this.state.bestSellerProducts },
+                  { title: "LATEST OFFER", data: this.state.bestSellerProducts }]}
+                  renderSectionHeader={({ section: { title } }) => (
+                    <View style={styles.textView}>
+                      <Text style={styles.titleText}>{title}</Text>
+                    </View>
+                  )}
+                  initialNumToRender={5}
                   renderItem={({ item, index }) =>
 
+                    index % 2 == 0 &&
+                    <View style={{ flexDirection: 'row' }}>
+                      <Product
+                        handlePress={() => this.handlePress(this.state.bestSellerProducts[index])}
+                        handleLike={(e) => { this.handleLike(e, this.state.bestSellerProducts[index]) }}
+                        handleCartAddOne={() => this.handleCartAddOne(this.state.bestSellerProducts[index])}
+                        src={this.state.bestSellerProducts[index]}
+                      />
+                      {this.state.bestSellerProducts[index + 1] &&
+                        <Product
+                          handlePress={() => this.handlePress(this.state.bestSellerProducts[index + 1])}
+                          handleLike={(e) => { this.handleLike(e, this.state.bestSellerProducts[index + 1]) }}
+                          handleCartAddOne={() => this.handleCartAddOne(this.state.bestSellerProducts[index + 1])}
+                          src={this.state.bestSellerProducts[index + 1]}
+                        />}
+                    </View>
 
-                    // <Text>sd</Text>
 
-
-                    <Product handlePress={() => this.handlePress(item)}
-                      src={item}
-                    />
+                    // <Product
+                    //   handlePress={() => this.handlePress(item)}
+                    //   handleLike={(e) => { this.handleLike(e, item) }}
+                    //   handleCartAddOne={() => this.handleCartAddOne(item)}
+                    //   src={item}
+                    // />
 
                   }
                   refreshControl={
@@ -366,11 +352,11 @@ class Home extends React.Component {
                   style={{ width: '100%' }}
                   keyExtractor={(item, index) => index}
                   horizontal={false}
-                  numColumns={2}
+                // numColumns={2}
                 >
                   {/* <RefreshControl  refreshing={this.state.refreshing} onRefresh={()=>this.onRefresh()} /> */}
 
-                </FlatList>
+                </SectionList>
 
 
 
@@ -414,7 +400,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
 
-  }, yellowUpperOnly: {
+  },
+  yellowUpperOnly: {
     marginTop: 150
   }
   ,
@@ -498,7 +485,8 @@ const styles = StyleSheet.create({
   },
   mainImageStyle: {
     width: Dimensions.get('window').width * 62 / 375,
-    height: Dimensions.get('window').width * 62 / 375
+    height: Dimensions.get('window').width * 62 / 375,
+    resizeMode: "contain"
   },
   cartImageStyle: {
     width: 37,
@@ -515,8 +503,7 @@ const styles = StyleSheet.create({
     width: Dimensions.get('window').width * 106 * .95 / 375,
     height: Dimensions.get('window').height * 95 * .95 / 812,
     borderRadius: 15,
-    marginLeft: 5,
-    marginRight: 5,
+    margin: 5,
     justifyContent: 'flex-end',
     alignItems: 'center',
     backgroundColor: colors.white,
@@ -544,6 +531,7 @@ const styles = StyleSheet.create({
   },
   horizontalScrollController: {
     height: Dimensions.get('window').height * 95 * 2.3 * .95 / 812,
+    marginLeft: 10
   },
   yellowContainer: {
     flexDirection: 'row',
@@ -600,11 +588,15 @@ const styles = StyleSheet.create({
   }
 });
 const mapStateToProps = state => ({
-  productsReducer: state.productsReducer,
-  cartReducer: state.cartReducer
+  // productsReducer: state.productsReducer,
+  cartReducer: state.cartReducer,
+  bestsellerReducer: state.bestsellerReducer,
+  categoryReducer: state.categoryReducer,
+
 })
 const mapDispatchToProps = {
-  refreshtProducts,
-  firstGetProducts
+  // refreshtProducts,
+  // firstGetProducts,
+  setCart,
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Home)

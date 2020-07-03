@@ -1,4 +1,4 @@
-import React from 'react';
+import React , { useState }from 'react';
 import { StyleSheet, Text, View, CheckBox, TouchableHighlight, Button, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
 import store from '../../store'
 import { connect } from 'react-redux'
@@ -12,6 +12,11 @@ import FastImage from 'react-native-fast-image'
 
 
 export default Product = (data) => {
+    const [heart, setHeart] = useState(require("../../assets/icons/heart-sq.png"));
+    const handleChange = bool => {
+        
+        data.handleLike(bool);
+    }
 
     return (
 
@@ -42,8 +47,15 @@ export default Product = (data) => {
             </View>
             <View style={styles.cartHolder}>
                 <View style={styles.heartContainer}>
-                    <TouchableOpacity style={{ justifyContent: "center", alignItems: 'center', height: "100%" }}>
-                        <Image source={require("../../assets/icons/heart-sq.png")}
+                    <TouchableOpacity style={{ justifyContent: "center", alignItems: 'center', height: "100%" }}
+                    onPress={()=>{
+                        heart==require("../../assets/icons/heart-sq.png")?
+                        setHeart(require("../../assets/icons/heart-red.png"))
+                        :setHeart(require("../../assets/icons/heart-sq.png"))
+                        
+                        handleChange(heart==require("../../assets/icons/heart-sq.png"))}
+                    }>
+                        <Image source={heart}
                             style={styles.heart} />
                     </TouchableOpacity>
                     <View style={{ justifyContent: "center", alignItems: 'center', height: "100%" }}>
@@ -51,7 +63,8 @@ export default Product = (data) => {
                     </View>
                 </View>
                 <View style={styles.cartContainer}>
-                    <TouchableOpacity style={{ height: "100%", justifyContent: "center", alignItems: 'center' }}>
+                    <TouchableOpacity style={{ height: "100%", justifyContent: "center", alignItems: 'center' }}
+                    onPress={data.handleCartAddOne}>
                         <Image source={require("../../assets/icons/cartIn.png")}
                             style={styles.cart} />
                     </TouchableOpacity>

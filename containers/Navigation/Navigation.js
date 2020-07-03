@@ -13,6 +13,7 @@ import Home from '../Home/Home'
 import JBHome from '../JBHome/JBHome'
 import productInfo from '../ProductInfo/ProductInfo'
 import MainCategory from '../MainCategory/MainCategory'
+import SubCategory from '../SubCategory/SubCategory'
 import Orders from '../Orders/Orders'
 import Favorites from '../Favorites/Favorites'
 import SearchResults from "../SearchResults/SearchResults"
@@ -25,6 +26,7 @@ const HomeStack = createStackNavigator({
    Home,
    MainCategory,
    SearchResults,
+   SubCategory
 })
 // main tab navigator 
 const MainTabNavigator = createBottomTabNavigator({

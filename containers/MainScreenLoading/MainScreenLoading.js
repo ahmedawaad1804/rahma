@@ -4,6 +4,8 @@ import { StyleSheet, Image, View, ActivityIndicator, Dimensions } from 'react-na
 import colors from '../../colors'
 
 import { refreshtProducts,firstGetProducts } from '../../actions/product'
+import {getBestSeller } from '../../actions/bestSeller'
+import {getCategory } from '../../actions/Category'
 import store from '../../store'
 import { connect } from 'react-redux'
 
@@ -16,7 +18,7 @@ class MainScreenLoading extends React.Component {
     dataService.getProducts().then(response => {
       //save token and navigatexf
       // console.log(response.data.products);
-      console.log(response.data.products);
+      // console.log(response.data.products);
       
       this.props.firstGetProducts(response.data.products)
       this.props.navigation.navigate("AuthStack")
@@ -28,6 +30,8 @@ class MainScreenLoading extends React.Component {
 
     }
     )
+    this.props.getBestSeller()
+    this.props.getCategory()
 
 
 
@@ -61,7 +65,9 @@ const styles = StyleSheet.create({
 });
 const mapDispatchToProps = {
   refreshtProducts,
-  firstGetProducts
+  firstGetProducts,
+  getBestSeller,
+  getCategory
  };
  const mapStateToProps = state => ({
   productsReducer:state.productsReducer
