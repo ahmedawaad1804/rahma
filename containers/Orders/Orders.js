@@ -9,7 +9,7 @@ import { Avatar, Badge, Icon, withBadge } from 'react-native-elements'
 import { setCart } from '../../actions/product'
 import { Header } from 'react-navigation';
 /* toast */
-import Toast from 'react-native-simple-toast';
+// import Toast from 'react-native-simple-toast';
 /* component */
 import OrderItem from '../../components/OrderItem/OrderItem'
 class MainCategory extends React.Component {
@@ -54,9 +54,10 @@ class MainCategory extends React.Component {
         this.setState({ loop: this.state.orders })
         this.setState({ _isDataLoaded: true })
         /// test
-        setTimeout(() => {
-            this.setState({ _isLogIn: true })
-        }, 5000);
+        // console.log(this.props.loginReducer);
+        if(this.props.loginReducer){
+            this.setState({_isLogIn:true})
+        }
     }
 
     _handlePress = (item) => {
@@ -281,7 +282,7 @@ const styles = StyleSheet.create({
     },
 });
 const mapStateToProps = state => ({
-    www: state.www,
+    loginReducer: state.loginReducer,
     cartReducer: state.cartReducer,
     productsReducer: state.productsReducer
 })

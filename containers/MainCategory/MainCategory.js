@@ -9,7 +9,7 @@ import { Avatar, Badge, Icon, withBadge } from 'react-native-elements'
 import { setCart } from '../../actions/product'
 import { Header } from 'react-navigation';
 /* toast */
-import Toast from 'react-native-simple-toast';
+// import Toast from 'react-native-simple-toast';
 /* component */
 import Product from '../../components/Product/Product'
 import CategoryItem from '../../components/CategoryItem/CategoryItem'
@@ -34,7 +34,7 @@ class MainCategory extends React.Component {
         this.props.setCart({
             item: item, count: 1,
         })
-        Toast.show(`${item.productNameEN} added to cart`);
+        // Toast.show(`${item.productNameEN} added to cart`);
 
     }
     handleLike(bool, item) {
@@ -50,9 +50,11 @@ class MainCategory extends React.Component {
             this.setState({ counter: this.props.cartReducer.length })
 
         });
-        console.log(this.props.navigation.state.params.props.item.category);
+        // console.log(this.props.navigation.state.params.props.item.nameEN);
+        // console.log(this.props.navigation.state.params.props);
+        
         this.setState({ bestSellerProducts: this.props.bestsellerReducer }, (() => { this.setState({ isDataLoaded: true }) }))
-        this.setState({ categoryArr: this.props.navigation.state.params.props.item.category }, (() => { this.setState({ isDataLoaded: true }) }))
+        this.setState({ categoryArr: this.props.navigation.state.params.props.item.Catygory }, (() => { this.setState({ isDataLoaded: true }) ; console.log(this.state.categoryArr)        }))
 
 
     }
@@ -70,7 +72,7 @@ class MainCategory extends React.Component {
     submitItem = () => {
         this.props.setCart({ itemID: this.props.navigation.state.params.item.id, count: this.state.count })
         if (this.state.count > 0) {
-            Toast.show(`${this.props.navigation.state.params.item.productNameEN} added to cart`);
+            // Toast.show(`${this.props.navigation.state.params.item.productNameEN} added to cart`);
         }
 
     }
@@ -119,7 +121,8 @@ class MainCategory extends React.Component {
                         }}>{this.props.navigation.state.params.title}</Text>
                     </View>
                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                        <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingLeft: 30, width: "70%" }}>
+                        <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingLeft: 30, width: "70%" }}
+                            onPress={() => { this.props.navigation.navigate("Cart") }}>
                             <Image source={require("../../assets/icons/cart.png")}
                                 style={styles.cartImageStyle} />
                             {this.state.counter > 0 ? (<Badge
@@ -170,8 +173,8 @@ class MainCategory extends React.Component {
                                 showsVerticalScrollIndicator={false}
                                 contentContainerStyle={styles.grid}
                                 sections={[
-                                    { title: "BEST SELLER", data: this.state.categoryArr },
-                                    { title: "DISCOVER", data: this.state.bestSellerProducts },]}
+                                    { title: "DISCOVER", data: this.state.categoryArr },
+                                    { title: "NEWEST ARRIVAL", data: this.state.bestSellerProducts },]}
                                 renderSectionHeader={({ section: { title } }) => (
                                     <View style={styles.textView}>
                                         <Text style={styles.titleText}>{title}</Text>
@@ -179,7 +182,7 @@ class MainCategory extends React.Component {
                                 )}
                                 initialNumToRender={30}
                                 renderItem={({ item, index }) =>
-                                    !item.name ?
+                                    !item.icon ?
                                         index % 2 == 0 &&
                                         <View style={{ flexDirection: 'row' }}>
                                             <Product
@@ -201,17 +204,17 @@ class MainCategory extends React.Component {
                                         <View style={{ flexDirection: 'row' }}>
 
                                             <CategoryItem
-                                                click={() => this.navigateSubCategory(this.state.categoryArr[index],this.props.navigation.state.params.props.item.mainCategory)}
+                                                click={() => this.navigateSubCategory(this.state.categoryArr[index],this.props.navigation.state.params.props.item.nameEN)}
                                                 src={this.state.categoryArr[index]}
                                             />
                                             {this.state.categoryArr[index + 1] &&
                                                 <CategoryItem
-                                                    click={() => this.navigateSubCategory(this.state.categoryArr[index+1],this.props.navigation.state.params.props.item.mainCategory)}
+                                                    click={() => this.navigateSubCategory(this.state.categoryArr[index+1],this.props.navigation.state.params.props.item.nameEN)}
                                                     src={this.state.categoryArr[index+1]}
                                                 />}
                                             {this.state.categoryArr[index + 2] &&
                                                 <CategoryItem
-                                                    click={() => this.navigateSubCategory(this.state.categoryArr[index+2],this.props.navigation.state.params.props.item.mainCategory)}
+                                                    click={() => this.navigateSubCategory(this.state.categoryArr[index+2],this.props.navigation.state.params.props.item.nameEN)}
                                                     src={this.state.categoryArr[index+2]}
                                                 />
                                             }

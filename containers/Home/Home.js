@@ -12,6 +12,7 @@ import Product from '../../components/Product/Product'
 import { Avatar, Badge, Icon, withBadge } from 'react-native-elements'
 /* action */
 import { refreshtProducts, firstGetProducts, setCart } from '../../actions/product'
+import { getCategory } from '../../actions/Category'
 /* services */
 import dataService from '../../services/dataService'
 /* adv */
@@ -21,7 +22,7 @@ import Adv from '../../components/Ads/Ads'
 import MainCategoryItem from '../../components/MainCategoryItem/MainCategoryItem'
 
 /* toast */
-import Toast from 'react-native-simple-toast';
+// import Toast from 'react-native-simple-toast';
 /* pagination */
 import Carousel from 'react-native-snap-carousel';
 
@@ -65,25 +66,39 @@ class Home extends React.Component {
     searchWord: "",
     _isSearch: false,
     searchData: [],
-    index: 0
+    index: 0,
+    dataAdv: [
+      { key: 'Supermarket' },
+      { key: 'Pastry' },
+      { key: 'Mini Market' },
+      { key: 'Beauty' },
+      { key: 'f' },
+   
+
+
+    ],
 
   };
 
 
   componentDidMount() {
-    // console.log(this.state);
+    this.setState({ count: this.props.cartReducer.length })
+
     store.subscribe(() => {
       this.setState({ count: this.props.cartReducer.length })
+// console.log("home");
 
       // Some DOM api calls.
     });
 
-    this.setState({ bestSellerProducts: this.props.bestsellerReducer }, (() => { this.setState({ isDataLoaded: true }) }))
+    this.setState({ bestSellerProducts: this.props.productsReducer }, (() => { this.setState({ isDataLoaded: true }) }))
 
-    // console.log(this.props.categoryReducer);
+    console.log(this.props.categoryReducer);
     let temp = []
     this.props.categoryReducer.map(category => temp.push(category.mainCategory))
     this.setState({ data: temp })
+    // console.log();
+    
   }
 
 
@@ -91,6 +106,8 @@ class Home extends React.Component {
     console.log("onRefresh");
     this.setState({ refreshing: true })
     this.props.refreshtProducts()
+    this.props.getCategory()
+    
     this.setState({ refreshing: false })
     this.setState({ bestSellerProducts: this.props.bestsellerReducer })
 
@@ -115,10 +132,11 @@ class Home extends React.Component {
     this.props.setCart({
       item: item, count: 1,
     })
-    Toast.show(`${item.productNameEN} added to cart`);
+    // Toast.show(`${item.productNameEN} added to cart`);
 
   }
   handleLike(bool, item) {
+
     console.log(bool);
 
     console.log("liked");
@@ -128,7 +146,7 @@ class Home extends React.Component {
   }
   _handleSearchButton() {
     if (this.state.searchData.length == 0) {
-      Toast.show("No Search input");
+      // Toast.show("No Search input");
     } else {
       this.props.navigation.navigate("SearchResults", { items: this.state.searchData })
 
@@ -142,9 +160,10 @@ class Home extends React.Component {
 
     let i = 0;
     if (text != "") {
+      this.setState({ _isSearch: true })
       dataService.search(text).then(response => {
         this.setState({ searchData: response.data }, () => {
-          this.setState({ _isSearch: true })
+          
 
         })
       }
@@ -179,11 +198,11 @@ class Home extends React.Component {
     <View style={{ alignItems: 'center' }}>
 
 
-      <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * 15 / 812 }}></View>
+      {/* <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * 15 / 812 }}></View> */}
       <View style={styles.textView}>
         <Carousel
           // ref={(c) => { this._carousel = c; }}
-          data={this.state.data}
+          data={this.state.dataAdv}
           renderItem={() => <Adv />}
           sliderWidth={Dimensions.get('window').width}
           itemWidth={Dimensions.get('window').width * 343 / 375}
@@ -206,11 +225,11 @@ class Home extends React.Component {
             index % 2 == 0 &&
             <View >
               <MainCategoryItem
-                click={() => this.navigateMainCategory(`${this.props.categoryReducer[index].mainCategory}`, { item: this.props.categoryReducer[index] })}
+                click={() => this.navigateMainCategory(`${this.props.categoryReducer[index].nameEN}`, { item: this.props.categoryReducer[index] })}
                 src={this.props.categoryReducer[index]} />
               {this.props.categoryReducer[index + 1] &&
                 <MainCategoryItem
-                  click={() => this.navigateMainCategory(`${this.props.categoryReducer[index + 1].mainCategory}`, { item: this.props.categoryReducer[index + 1] })}
+                  click={() => this.navigateMainCategory(`${this.props.categoryReducer[index + 1].nameEN}`, { item: this.props.categoryReducer[index + 1] })}
 
                   src={this.props.categoryReducer[index + 1]} />}
             </View>
@@ -234,7 +253,7 @@ class Home extends React.Component {
 
         <View style={styles.mainImageView}>
           <View style={{ backgroundColor: '#ccc', width: Dimensions.get('window').width * 1 / 2 - (Dimensions.get('window').width * 62 / 375) / 2 }}></View>
-          <Image source={require("../../assets/logo-bg.png")}
+          <Image source={require("../../assets/logo-flat.png")}
             style={styles.mainImageStyle} />
           {/* <View style={{ backgroundColor: '#ccc', width: Dimensions.get('window').width * 90 / 400 }}></View> */}
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
@@ -278,6 +297,7 @@ class Home extends React.Component {
               secureTextEntry={this.state.showPass}
               autoCapitalize='none'
               onChangeText={(text) => this._handleSearch(text)}
+              // onBlur={() => {this.setState({ _isSearch: false })}}
             />
           </View>
           <View style={styles.searchView}>
@@ -307,6 +327,7 @@ class Home extends React.Component {
                   // ItemSeparatorComponent = { (<View><Text>asdf</Text></View>) }
                   showsVerticalScrollIndicator={false}
                   contentContainerStyle={styles.grid}
+                  
                   sections={[{ title: "BEST SELLER", data: this.state.bestSellerProducts },
                   { title: "LATEST OFFER", data: this.state.bestSellerProducts }]}
                   renderSectionHeader={({ section: { title } }) => (
@@ -458,7 +479,8 @@ const styles = StyleSheet.create({
   titleText: {
     marginLeft: Dimensions.get('window').width * 15 / 375,
     fontFamily: 'Cairo-Bold',
-    fontSize: 20
+    fontSize: 20,
+    backgroundColor:colors.white
   },
   textView: {
     alignItems: 'flex-start',
@@ -486,7 +508,8 @@ const styles = StyleSheet.create({
   mainImageStyle: {
     width: Dimensions.get('window').width * 62 / 375,
     height: Dimensions.get('window').width * 62 / 375,
-    resizeMode: "contain"
+    resizeMode: "contain",
+
   },
   cartImageStyle: {
     width: 37,
@@ -588,15 +611,16 @@ const styles = StyleSheet.create({
   }
 });
 const mapStateToProps = state => ({
-  // productsReducer: state.productsReducer,
+  productsReducer: state.productsReducer,
   cartReducer: state.cartReducer,
   bestsellerReducer: state.bestsellerReducer,
   categoryReducer: state.categoryReducer,
 
 })
 const mapDispatchToProps = {
-  // refreshtProducts,
+  refreshtProducts,
   // firstGetProducts,
   setCart,
+  getCategory
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Home)

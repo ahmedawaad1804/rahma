@@ -14,8 +14,8 @@ export default CategoryItem = (data) => {
   return (
     <View>
       <TouchableOpacity style={styles.gridCell} onPress={data.click} >
-        <Image style={styles.imageThumbnail, { width: 141 / 3, height: 118 / 3 }} source={require("../../assets/categories/pastry.png")} />
-        <Text style={styles.smallText}>{data.src.name}</Text>
+        <Image style={styles.imageThumbnail} source={{uri:`http://www.beemallshop.com/img/CatIcons/${data.src.icon}`}} />
+        <Text style={styles.smallText}>{data.src.nameEN}</Text>
         <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * 12 / 812 }}></View>
       </TouchableOpacity>
     </View>
@@ -33,6 +33,7 @@ const styles = StyleSheet.create({
 
     height: 50,
     width: 50,
+    resizeMode:'contain'
 },
 gridCell: {
     width: Dimensions.get('window').width * 106 * .95 / 375,

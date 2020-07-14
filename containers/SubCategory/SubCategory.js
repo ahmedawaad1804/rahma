@@ -9,7 +9,7 @@ import { Avatar, Badge, Icon, withBadge } from 'react-native-elements'
 import { setCart } from '../../actions/product'
 import { Header } from 'react-navigation';
 /* toast */
-import Toast from 'react-native-simple-toast';
+// import Toast from 'react-native-simple-toast';
 /* component */
 import Product from '../../components/Product/Product'
 /* services */
@@ -19,7 +19,8 @@ class SubCategory extends React.Component {
         _isPressed: "All",
         data: [],
         category: [],
-        allData: []
+        allData: [],
+        counter:this.props.cartReducer.length,
 
     };
 
@@ -30,7 +31,7 @@ class SubCategory extends React.Component {
 
     }
     getData() {
-        dataService.getSubCategoryItems(this.props.navigation.state.params.mainCategory, this.props.navigation.state.params.items.name).then(response => {
+        dataService.getSubCategoryItems(this.props.navigation.state.params.mainCategory, this.props.navigation.state.params.items.nameEN).then(response => {
 
             this.setState({ allData: response.data }, () => this.setState({ data: this.state.allData }))
         }
@@ -39,11 +40,17 @@ class SubCategory extends React.Component {
         })
     }
     componentDidMount() {
-        // console.log(this.props.navigation.state.params.items.name)
+        // console.log(this.props.navigation.state.params)
+        // console.log(this.props.navigation.state.params.items.subCategory)
+        // console.log("Ffffffffffffff");
+        
         // console.log(this.props.navigation.state.params.items.name,this.props.navigation.state.params.mainCategory);
-
-        let arr = []
-        arr = [...this.props.navigation.state.params.items.subCategory]
+       
+        let temp ,arr= []
+        temp = [...this.props.navigation.state.params.items.subCategory]
+        temp.forEach(
+            element=> arr.push(element.nameEN)
+        )
         arr.unshift("All")
 
 
@@ -100,10 +107,11 @@ class SubCategory extends React.Component {
                         <Text style={{
                             fontFamily: 'Cairo-Regular',
                             fontSize: 20,
-                        }}>{this.props.navigation.state.params.items.name}</Text>
+                        }}>{this.props.navigation.state.params.items.nameEN}</Text>
                     </View>
                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                        <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingLeft: 30, width: "70%" }}>
+                        <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingLeft: 30, width: "70%" }}
+                            onPress={() => { this.props.navigation.navigate("Cart") }}>
                             <Image source={require("../../assets/icons/cart.png")}
                                 style={styles.cartImageStyle} />
                             {this.state.counter > 0 ? (<Badge

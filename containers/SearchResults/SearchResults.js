@@ -9,7 +9,7 @@ import { Avatar, Badge, Icon, withBadge } from 'react-native-elements'
 import { setCart } from '../../actions/product'
 import { Header } from 'react-navigation';
 /* toast */
-import Toast from 'react-native-simple-toast';
+// import Toast from 'react-native-simple-toast';
 /* component */
 import Product from '../../components/Product/Product'
 class SearchResults extends React.Component {

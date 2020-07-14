@@ -10,22 +10,27 @@ import { Header } from 'react-navigation';
   constructor(props) {
     super(props);
 }
+state={
+  source:""
+}
 componentDidMount(){
   // this.props
+  this.setState({source:this.props.src.icon})
 }
-shouldComponentUpdate(){
-  console.log("amuy");
+// shouldComponentUpdate(){
+//   console.log("amuy");
   
-  return false
-}
+//   return false
+// }
 
   // console.log(data);
 render(){
   return (
     <View>
       <TouchableOpacity style={styles.gridCell} onPress={()=>{this.props.click()}}>
-        <Image style={styles.imageThumbnail, { width: 141 / 3, height: 118 / 3 }} source={require("../../assets/categories/pastry.png")} />
-        <Text style={styles.smallText}>{this.props.src.mainCategory}</Text>
+        <Image style={styles.imageThumbnail} source={{uri:`http://www.beemallshop.com/img/MainCatIcons/${this.state.source}`}}
+        onError={()=>{this.setState({source:"Beauty"})}}/>
+        <Text style={styles.smallText}>{this.props.src.nameEN}</Text>
         <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * 12 / 812 }}></View>
       </TouchableOpacity>
     </View>
@@ -43,6 +48,8 @@ const styles = StyleSheet.create({
 
     height: 50,
     width: 50,
+    resizeMode:"contain"
+    // , { width: 141 / 3, height: 118 / 3 }
 },
 gridCell: {
     width: Dimensions.get('window').width * 106 * .95 / 375,

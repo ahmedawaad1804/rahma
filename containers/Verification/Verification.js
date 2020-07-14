@@ -7,7 +7,9 @@ import authService from '../../services/authService'
 /* colors */
 import colors from '../../colors'
 import { Header } from 'react-navigation';
-
+/* token */
+import { setToken } from '../../utility/storage'
+import {setLogin} from '../../actions/loginAction'
 
 /* confirmation */
 import OTPInputView from '@twotalltotems/react-native-otp-input'
@@ -57,12 +59,14 @@ class Verification extends React.Component {
     setTimeout(() => {
       this.setState({ _checkVer: false })
     }, 1000);
-    console.log(this.props.navigation.getParam("phonenumber") + " 1 ");
 
     authService.verifyOTP(this.props.navigation.getParam("phonenumber"), this.state.code).then(response => {
-      console.log(response.data.status);
+      
+      setToken(response.data.token)
+      this.props.setLogin("n")
       this.props.navigation.navigate("JBHome")
       this.setState({ _checkVer: false })
+
 
     }
     ).catch(err => {
@@ -277,4 +281,7 @@ const styles = StyleSheet.create({
 const mapStateToProps = state => ({
   www: state.www
 })
-export default connect(mapStateToProps)(Verification)
+const mapDispatchToProps = {
+  setLogin
+};
+export default connect(mapStateToProps,mapDispatchToProps)(Verification)

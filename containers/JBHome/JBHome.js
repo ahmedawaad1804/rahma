@@ -10,16 +10,19 @@ import { connect } from 'react-redux'
 import dataService from '../../services/dataService'
 
 class JBHome extends React.Component {
-
+state={
+  username:" ",
+  
+}
   componentDidMount() {
 
-setTimeout(() => {
- 
-      this.props.navigation.navigate("MainStack")
-     
+    setTimeout(() => {
 
-   
-}, 3000);
+      this.props.navigation.navigate("MainStack")
+
+
+
+    }, 3000);
 
 
   }
@@ -32,11 +35,11 @@ setTimeout(() => {
 
         </View>
         <Text style={{ fontSize: 50, marginLeft: 40, fontFamily: "Cairo-Regular" }}>Welcome ...</Text>
-        <View style={{flexDirection:'row'}}>
-          <Text style={{ fontSize: 30, marginLeft: 60,marginRight: 40, fontFamily: "Cairo-Regular" }}>Ahmed Awaad</Text>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={{ fontSize: 30, marginLeft: 60, marginRight: 40, fontFamily: "Cairo-Regular" }}>{this.state.username}</Text>
           <ActivityIndicator size={50} color={colors.white} />
         </View>
-        
+
       </View>
     );
   }
@@ -56,7 +59,7 @@ const mapDispatchToProps = {
   firstGetProducts
 };
 const mapStateToProps = state => ({
-  productsReducer: state.productsReducer
+  loginReducer: state.loginReducer
 })
 export default connect(mapStateToProps, mapDispatchToProps)(JBHome)
 

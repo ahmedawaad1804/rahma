@@ -1,13 +1,14 @@
 import React from 'react';
 import { AsyncStorage } from 'react-native';
-import { StyleSheet, Text, View, Platform, CheckBox, ActivityIndicator, Button, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, Platform, Animated, Alert, CheckBox, ActivityIndicator, Button, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
 import store from '../../store'
 import { connect } from 'react-redux'
 /* localization */
 import * as Localization from 'expo-localization';
 import i18n from 'i18n-js';
 import { IMLocalized, init } from '../../utilities/IMLocalized';
-
+/* token */
+import { setToken } from '../../utility/storage'
 /* colors */
 import colors from '../../colors'
 /* padding */
@@ -16,10 +17,100 @@ import Padv from '../../components/ViewPad/PadV'
 import authService from '../../services/authService'
 /* redux*/
 import { getProducts } from '../../actions/product'
+import {setLogin} from '../../actions/loginAction'
+/* facebook */
+import { Ionicons, FontAwesome } from "@expo/vector-icons";
+import * as Facebook from 'expo-facebook';
+
+/* google */ 
+import * as Google from 'expo-google-app-auth';
+// ios clientID=628256299763-a7af1lisn6f4vh8vt6g2uhu4l8sp8k31.apps.googleusercontent.com
 class Login extends React.Component {
   ////
+  FBlogIn = async () => {
+    Facebook.initializeAsync("1209270809432735")
+    try {
+      const {
+        type,
+        token,
+        expires,
+        permissions,
+        declinedPermissions
+      } = await Facebook.logInWithReadPermissionsAsync("1209270809432735", {
+        permissions: ["public_profile"]
+      });
+
+      if (type === "success") {
+        // Get the user's name using Facebook's Graph API
+        const response = await fetch(
+          `https://graph.facebook.com/me?access_token=${token}`
+        );
+        const userData = await response.json()
+
+        // console.log(token);
+        const responseData=await fetch(`https://graph.facebook.com/me?fields=id,name,first_name,last_name,middle_name,picture,email&access_token=${token}`)
+        // .then(response => response.json())
+        // .then(data => console.log(data));
+        const res=await responseData.json()
+        // console.log(res);
+        
+        // this.setState({ lParams: await response.json().id })
+        // this.setState({ fb: token })
+
+        authService.checkFaceBookUser(userData.id).then(
+          response => {
+            if (response.data.status == "Exist") { 
+              // console.log(response.data.user);
+              setToken(response.data.token)
+              this.props.setLogin("f")
+              this.props.navigation.navigate("JBHome")
+              
+            }
+            else if (response.data.status == "Not Exist") {
+              console.log("Not Exist");
+              
+              this.props.navigation.navigate("VerifyFBSignUp",{userData,token,fbImage:res.picture.data.url})
+            }
 
 
+          }
+
+        ).catch(
+          err => {
+            console.log(err);
+          }
+        )
+
+        Alert.alert("Logged in!", `Hi ${(await response.json()).name}!`);
+      } else {
+        alert(`Facebook Login Error: Cancelled`);
+      }
+    } catch ({ message }) {
+      console.log(`Facebook Loginr Error: ${message}`);
+    }
+  };
+  googleLogIn = async () => {
+    try {
+      
+      const { type, accessToken, user } = await Google.logInAsync({androidClientId:"628256299763-6ufb00uro0ehiog4s8ud0hd3hs6jd0ft.apps.googleusercontent.com"});
+      if (type === 'success') {
+        // Then you can use the Google REST API
+        let userInfoResponse = await fetch('https://www.googleapis.com/userinfo/v2/me', {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        })
+        const userData = await userInfoResponse.json()
+        console.log( userData);
+        // .then(res=>res.json())
+        // .then(res=>
+        //   {
+        //     console.log(res);
+        //   }).catch(err=>{console.log(err);})
+      }
+
+    } catch ({ message }) {
+      console.log(message);
+    }
+  };
   static navigationOptions = { header: null }
 
   state = {
@@ -31,9 +122,15 @@ class Login extends React.Component {
     passwordError: true,
     errorMessage: " ",
     _error: false,
-    showPass: true
+    showPass: true,
+    
+    animeHeight: new Animated.Value(Dimensions.get('window').height * 2)
   }
   componentDidMount() {
+    Animated.timing(this.state.animeHeight, {
+      toValue: Dimensions.get('window').height,
+      duration: 1000
+    }).start();
     // store.dispatch(getProducts())
     // this.props.updateLang({asd:"asdsd"})
     this._handleRememberMeGet()
@@ -42,6 +139,7 @@ class Login extends React.Component {
     i18n.locale = "cc"
     // console.log(i18n);
 
+  
 
 
   }
@@ -96,9 +194,10 @@ class Login extends React.Component {
         this.setState({ _ckeckSignIn: true })
         authService.login(this.state.phonenumber, this.state.password).then(response => {
           //save token and navigatexf
-          // console.log(response.data.status);
-
-          this.props.navigation.navigate("MainStack")
+          console.log(response.data.token);
+          setToken(response.data.token)
+          this.props.setLogin("n")
+          this.props.navigation.navigate("JBHome")
 
         }
         ).catch(err => {
@@ -137,7 +236,6 @@ class Login extends React.Component {
       const phonenumber = await AsyncStorage.getItem('phonenumber');
       const password = await AsyncStorage.getItem('password');
 
-
       this.setState({ phonenumber: phonenumber })
       this.setState({ password: password })
 
@@ -154,15 +252,16 @@ class Login extends React.Component {
 
   render() {
     return (
-      <View style={styles.container}>
-        <KeyboardAvoidingView keyboardVerticalOffset={700} behavior='padding' style={styles.mainImageView}>
+      <Animated.View style={[styles.container, { height: this.state.animeHeight }]}>
+        <KeyboardAvoidingView  style={styles.mainImageView}>
 
           <Image source={require("../../assets/logo.png")}
             style={[styles.mainImageStyle, { marginBottom: 20 }]} />
         </KeyboardAvoidingView>
 
         <View style={styles.mainContainer}>
-          <Padv height={60} />
+
+          <Padv height={40} />
 
 
           <View style={styles.textView}>
@@ -264,8 +363,44 @@ class Login extends React.Component {
             </View>
 
           </View>
+          <View style={{flexDirection:'row'}}>
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#3f5c9a",
+              alignItems: "center",
+              justifyContent: "center",
+              width: Dimensions.get('window').width * 160 / 375,
+              height: Dimensions.get('window').height * 46 / 812,
+              borderColor: "#3f5c9a",
+              borderWidth: 1,
+              borderRadius: 50,
+              marginHorizontal:5
+            }}
+            onPress={this.FBlogIn}
+          >
 
-          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'center', }}>
+            <FontAwesome name="facebook-f" size={20} color="white" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#de5246",
+              alignItems: "center",
+              justifyContent: "center",
+              width: Dimensions.get('window').width * 160 / 375,
+              height: Dimensions.get('window').height * 46 / 812,
+              borderColor: "#de5246",
+              borderWidth: 1,
+              borderRadius: 50,
+              marginHorizontal:5
+
+            }}
+            onPress={this.googleLogIn}
+          >
+
+            <FontAwesome name="google" size={20} color="white" />
+          </TouchableOpacity>
+          </View>
+          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'flex-end' ,justifyContent: 'center', }}>
 
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', }}>
@@ -280,7 +415,7 @@ class Login extends React.Component {
           </View>
         </View>
 
-      </View>
+      </Animated.View>
     );
   }
 }
@@ -289,7 +424,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: '100%',
-    height: '100%',
+
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'flex-end',
@@ -423,5 +558,6 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   getProducts,
+  setLogin
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Login)

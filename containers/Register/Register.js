@@ -116,11 +116,7 @@ class Register extends React.Component {
           this.setState({ _error: true })
       this.setState({ errorMessage: "Enter a valid username" })
     }
-    if (!this._validateEmail(this.state.email)) {
-          this.setState({ _checkReg: false })
-          this.setState({ _error: true })
-      this.setState({ errorMessage: "Enter a valid email" })
-    }
+   
     setTimeout(() => {
 
       if (!this.state._error) { // invert flag
@@ -128,6 +124,7 @@ class Register extends React.Component {
         authService.register(this.state.phonenumber, this.state.password, this.state.username, this.state.email).then( async response => {
           //save token and navigatexf
           console.log(response.data.status);
+          
          
 
            await this._checkValidNumber(this.state.phonenumber)

@@ -9,7 +9,7 @@ import { Avatar, Badge, Icon, withBadge } from 'react-native-elements'
 import { setCart } from '../../actions/product'
 import { Header } from 'react-navigation';
 /* toast */
-import Toast from 'react-native-simple-toast';
+// import Toast from 'react-native-simple-toast';
 class ProductInfo extends React.Component {
     state = {
         count: 0,
@@ -19,6 +19,16 @@ class ProductInfo extends React.Component {
             "ahmed awaad",
             "ahmed awaad",
             "ahmed awaad", "ahmed awaad",
+            "ahmed awaad",
+            "ahmed awaad",
+            "ahmed awaad",
+            "ahmed awaad",
+            "ahmed awaad",
+            "ahmed awaad",
+            "ahmed awaad",
+            "ahmed awaad",
+            "ahmed awaad",
+            "ahmed awaad",
             "ahmed awaad",
 
 
@@ -48,13 +58,13 @@ class ProductInfo extends React.Component {
     submitItem = () => {
         
         if (this.state.count > 0) {
-            Toast.show(`${this.props.navigation.state.params.item.productNameEN} added to cart`);
+            // Toast.show(`${this.props.navigation.state.params.item.productNameEN} added to cart`);
             this.props.setCart({
                 item:this.props.navigation.state.params.item, count: this.state.count,
             })
         }
         else{
-            Toast.show("Add Quantity");
+            // Toast.show("Add Quantity");
         }
 
     }

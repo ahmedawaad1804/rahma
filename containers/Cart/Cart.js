@@ -9,9 +9,11 @@ import { Avatar, Badge, Icon, withBadge } from 'react-native-elements'
 import { setCartModifications } from '../../actions/product'
 import { Header } from 'react-navigation';
 /* toast */
-import Toast from 'react-native-simple-toast';
+// import Toast from 'react-native-simple-toast';
 /* component */
 import CartItem from '../../components/CartItem/CartItem'
+/* storage */
+import { AsyncStorage } from 'react-native';
 class Cart extends React.Component {
     static navigationOptions = { header: null }
 
@@ -25,8 +27,8 @@ class Cart extends React.Component {
     };
 
     componentDidMount() {
-        this.setState({ data: this.props.cartReducer },()=>{this.calculate()})
-        
+        this.setState({ data: this.props.cartReducer }, () => { this.calculate() })
+
 
     }
 
@@ -59,10 +61,27 @@ class Cart extends React.Component {
 
         let sum = 0;
         this.state.data.map(item => {
-            sum += item.item.price*item.count
+            sum += item.item.price * item.count
 
         })
         this.setState({ cost: sum })
+    }
+    async save() {
+        try {
+            await AsyncStorage.setItem(
+                'cart', JSON.stringify(this.props.cartReducer)
+            );
+            
+            // Toast.show("Cart Saved");
+
+        } catch (error) {
+            // Error saving data
+            console.log(error);
+
+        }
+
+
+
     }
     render() {
         return (
@@ -207,16 +226,18 @@ class Cart extends React.Component {
                         </View>
                         <View style={{ flex: 2, flexDirection: 'row' }}>
                             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', }}>
-                                <TouchableOpacity style={{ width: "80%", justifyContent: 'center', alignItems: 'center', borderRadius: 30, borderWidth: 2, borderColor: colors.primary 
-                       }}
-                       onPress={()=>{this.save()}}>
+                                <TouchableOpacity style={{
+                                    width: "80%", justifyContent: 'center', alignItems: 'center', borderRadius: 30, borderWidth: 2, borderColor: colors.primary
+                                }}
+                                    onPress={() => { this.save() }}>
                                     <Text style={{ fontSize: 14, fontFamily: "Cairo-SemiBold", padding: 10, }}>SAVE FOR LATER</Text>
                                 </TouchableOpacity>
                             </View>
                             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', }}>
-                                <TouchableOpacity style={{ width: "80%", justifyContent: 'center', alignItems: 'center', borderRadius: 30, backgroundColor: colors.primary 
-                            }}
-                            onPress={()=>{this.continue()}}>
+                                <TouchableOpacity style={{
+                                    width: "80%", justifyContent: 'center', alignItems: 'center', borderRadius: 30, backgroundColor: colors.primary
+                                }}
+                                    onPress={() => { this.continue() }}>
                                     <Text style={{ fontSize: 14, fontFamily: "Cairo-SemiBold", padding: 10, }}>CONTINUE</Text>
                                 </TouchableOpacity>
                             </View>

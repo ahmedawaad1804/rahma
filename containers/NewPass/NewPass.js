@@ -5,25 +5,14 @@ import { connect } from 'react-redux'
 /* colors */
 import colors from '../../colors'
 import { Header } from 'react-navigation';
+/* padding */
+import Padv from '../../components/ViewPad/PadV'
 
 class NewPass extends React.Component {
-  // static navigationOptions = {
-  //   title: 'My home',
-  //   headerStyle: {
-  //     backgroundColor: '#f4511e',
-  //   },
-  //   headerTintColor: '#fff',
-  //   // headerTitleStyle: {
-  //   //   fontWeight: 'bold',
-  //   // },
-  //   // headerRight: () => (
-  //   //   <View> <Text>daf</Text></View>
 
-  //   //  )
-  // }
   static navigationOptions = ({ navigation, screenProps }) => ({
-   
-      headerStyle: {
+
+    headerStyle: {
       backgroundColor: colors.primary,
       elevation: 0, // remove shadow on Android
       shadowOpacity: 0, // remove shadow on iOS
@@ -58,57 +47,116 @@ class NewPass extends React.Component {
   });
 
   state = {
-    checked: false
+    checked: false,
+    phonenumber: null,
+    _checkReset: false,
+    _error: false,
+    errorMessage: " ",
+    showPass: true,
+    password:null
   }
   componentDidMount() {
 
-    console.log('forgot');
+    console.log(this.props.navigation.state.params);
 
   }
+  _handlePassword(password) {
+    this.setState({ password })
+    this.setState({ _error: false })
 
+    this.setState({ errorMessage: " " })
+  }
+
+  reset() {
+
+    if (this.state.password) {
+      if (this.state.password.length <= 8) {
+        this.setState({ _error: true })
+        this.setState({ errorMessage: "Enter a valid Password" })
+
+      }
+    }
+    else {
+      this.setState({ _error: true })
+      this.setState({ errorMessage: "Enter a valid Password" })
+    }
+
+
+    setTimeout(() => {
+
+      if (!this.state._error) {
+
+
+        this.setState({ _checkReset: true })
+        authService.resetPassword(this.props.navigation.state.params.phonenumber,this.props.navigation.state.params.OTP,this.state.password).then(response => {
+       
+          this.setState({ _checkReset: false })
+
+          console.log("password has been reseted");
+          
+        }
+        ).catch(err => {
+          console.log(err.response.data.status)
+          this.setState({ _error: true })
+          this.setState({ errorMessage: err.response.data.status })
+          this.setState({ _checkReset: false })
+
+        }
+        )
+      }
+    }, 500);
+
+  }
   render() {
     return (
       <View style={styles.container}>
         <View style={styles.mainContainer}>
-        <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * (Header.HEIGHT) / 812 }}></View>
-        <View style={styles.textView}>
-          <Text style={styles.instructionText}>Enter your new password</Text>
-        </View>
-        <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * 19 / 812 }}></View>
+          <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * (Header.HEIGHT) / 812 }}></View>
+          <View style={styles.textView}>
+            <Text style={styles.instructionText}>Enter your new password</Text>
+          </View>
+          {this.state._error && (<Text style={styles.errorText}>{this.state.errorMessage}</Text>)}
+          {!this.state._error && (<Padv height={22} />)}
 
           <View style={[styles.yellowContainer, styles.yellowUpperOnly]}>
             <View style={styles.iconView}>
-              <Image source={require("../../assets/icons/envlop.png")}
+              <Image source={require("../../assets/icons/pad.png")}
                 style={styles.imageStyle} />
             </View>
-            <View style={styles.textInputView}>
+            <View style={styles.textInputViewPass}>
               <TextInput
                 style={styles.textInputStyle}
-                placeholder="Phone Number"
+                placeholder="New Password"
                 placeholderTextColor={'#ccc'}
                 width={Dimensions.get('window').width * 3 / 5}
-                errorStyle={{ color: 'red' }}
-                errorMessage={true ? 'Email is invalid' : ''}
+                onChangeText={(text) => this._handlePassword(text)}
+                secureTextEntry={this.state.showPass}
 
                 autoCapitalize='none'
-                secureTextEntry
 
               />
+
             </View>
+            <TouchableOpacity style={styles.iconViewEye}
+              onPress={() => { this.setState({ showPass: !this.state.showPass }) }}
+            >
+              <Image source={require("../../assets/icons/eye.png")}
+                style={styles.imageStyleEye} />
+            </TouchableOpacity>
           </View>
-         
+
           <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * 28 / 812 }}></View>
 
           <TouchableOpacity style={styles.tOpacity}
-            onPress={() => { this.props.navigation.navigate('Login') }}>
+            onPress={() => { this.reset() }}>
             <Text style={styles.text}>SAVE</Text>
           </TouchableOpacity>
 
 
 
-        
 
-         
+
+
 
         </View>
       </View>
@@ -163,9 +211,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   imageStyle: {
-    width: 30,
-    height: 25,
-    padding: 0
+    height: 25 / 1.1,
+    resizeMode: 'contain'
   },
   textInputView: {
     alignItems: 'flex-start',
@@ -183,12 +230,12 @@ const styles = StyleSheet.create({
   textView: {
     alignItems: 'flex-start',
     justifyContent: 'center',
-    width: Dimensions.get('window').width -85,
-    marginRight:85
+    width: Dimensions.get('window').width - 85,
+    marginRight: 85
     ,
   },
   instructionText: {
-    marginLeft:Dimensions.get('window').width *32 / 375,
+    marginLeft: Dimensions.get('window').width * 32 / 375,
     fontFamily: 'Cairo-Bold',
     fontSize: 14
     ,
@@ -200,7 +247,28 @@ const styles = StyleSheet.create({
   smallTextUnderLine: {
     fontFamily: 'Cairo-Bold',
     fontSize: 12,
-  }
+  },
+  imageStyleEye: {
+    width: 10,
+    height: 10,
+    padding: 10,
+    resizeMode: "contain"
+  },
+  iconViewEye: {
+
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    width: Dimensions.get('window').width * 54 / 375,
+    height: Dimensions.get('window').height * 46 / 812,
+
+  },
+  textInputViewPass: {
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    width: Dimensions.get('window').width * (343 - 110) / 375,
+    height: Dimensions.get('window').height * 46 / 812,
+  },
 });
 const mapStateToProps = state => ({
   www: state.www

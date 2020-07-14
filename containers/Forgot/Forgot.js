@@ -1,29 +1,17 @@
 import React from 'react';
-import { StyleSheet, Text, View, CheckBox, TouchableHighlight, Button, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, CheckBox, TouchableHighlight,ActivityIndicator, Platform, Button, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
 import store from '../../store'
 import { connect } from 'react-redux'
 /* colors */
 import colors from '../../colors'
 import { Header } from 'react-navigation';
-
+/* padding */
+import Padv from '../../components/ViewPad/PadV'
 class Forgot extends React.Component {
-  // static navigationOptions = {
-  //   title: 'My home',
-  //   headerStyle: {
-  //     backgroundColor: '#f4511e',
-  //   },
-  //   headerTintColor: '#fff',
-  //   // headerTitleStyle: {
-  //   //   fontWeight: 'bold',
-  //   // },
-  //   // headerRight: () => (
-  //   //   <View> <Text>daf</Text></View>
 
-  //   //  )
-  // }
   static navigationOptions = ({ navigation, screenProps }) => ({
-   
-      headerStyle: {
+
+    headerStyle: {
       backgroundColor: colors.primary,
       elevation: 0, // remove shadow on Android
       shadowOpacity: 0, // remove shadow on iOS
@@ -49,59 +37,120 @@ class Forgot extends React.Component {
       </View>
     ),
 
-  
+
   });
 
   state = {
-    checked: false
+    checked: false,
+    phonenumber: null,
+    _checkReset: false,
+    _error:false,
+    errorMessage:" "
   }
   componentDidMount() {
 
     console.log('forgot');
 
   }
+  _handlePhoneNumber(phonenumber) {
+    this.setState({ phonenumber })
+    this.setState({ _error: false })
 
+    this.setState({ errorMessage: " " })
+  }
+  _handleSubmit() {
+    if (this.state.phonenumber) {
+      if (this.state.phonenumber.length <= 10) {
+        this.setState({ _error: true })
+        this.setState({ errorMessage: "Enter a valid Phone number" })
+
+      }
+    }
+    else {
+      this.setState({ _error: true })
+      this.setState({ errorMessage: "Enter a valid Phone number" })
+    }
+   
+
+    setTimeout(() => {
+
+      if (!this.state._error) {
+
+       
+        this.setState({ _checkReset: true })
+        authService.sendOTP(this.state.phonenumber).then(response => {
+          //save token and navigatexf
+          // console.log(response.data.status);
+
+          this.props.navigation.navigate("VerificationReset",{phonenumber:this.state.phonenumber})
+          this.setState({ _checkReset: false })
+
+
+        }
+        ).catch(err => {
+          console.log(err.response.data.status)
+          this.setState({ _error: true })
+          this.setState({ errorMessage: err.response.data.status })
+          this.setState({ _checkReset: false })
+
+        }
+        )
+      }
+    }, 500);
+
+
+  }
   render() {
     return (
       <View style={styles.container}>
         <View style={styles.mainContainer}>
-        <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * (Header.HEIGHT) / 812 }}></View>
-        <View style={styles.textView}>
-          <Text style={styles.instructionText}>Enter the email address associated with your account</Text>
-        </View>
-        <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * 19 / 812 }}></View>
-
+          <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * (Header.HEIGHT) / 812 }}></View>
+          <View style={styles.textView}>
+            <Text style={styles.instructionText}>Enter the phone number associated with your account</Text>
+          </View>
+          {this.state._error && (<Text style={styles.errorText}>{this.state.errorMessage}</Text>)}
+          {!this.state._error && (<Padv height={22} />)}
           <View style={[styles.yellowContainer, styles.yellowUpperOnly]}>
             <View style={styles.iconView}>
-              <Image source={require("../../assets/icons/envlop.png")}
+              <Image source={require("../../assets/icons/user.png")}
                 style={styles.imageStyle} />
             </View>
+            
             <View style={styles.textInputView}>
               <TextInput
                 style={styles.textInputStyle}
                 placeholder="Phone Number"
                 placeholderTextColor={'#ccc'}
                 width={Dimensions.get('window').width * 3 / 5}
-                errorStyle={{ color: 'red' }}
-                errorMessage={true ? 'Email is invalid' : ''}
+                value={this.state.phonenumber}
 
+                keyboardType={Platform.OS ? "numeric" : "number-pad"}
                 autoCapitalize='none'
+                onChangeText={(text) => this._handlePhoneNumber(text)}
+
               />
             </View>
           </View>
-         
+
           <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * 28 / 812 }}></View>
 
           <TouchableOpacity style={styles.tOpacity}
-            onPress={() => { this.props.navigation.navigate('NewPass') }}>
-            <Text style={styles.text}>RESET PASSWORD</Text>
+            disabled={this.state._checkReset}
+            onPress={() => this._handleSubmit()}>
+            {
+              this.state._checkReset && (<ActivityIndicator size={20} color={colors.black} />)
+
+            }
+            {
+              !this.state._checkReset && (<Text style={styles.text}>RESET PASSWORD</Text>)
+            }
           </TouchableOpacity>
 
 
 
-        
 
-         
+
+
 
         </View>
       </View>
@@ -156,9 +205,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   imageStyle: {
-    width: 30/1.2,
-    height: 25/1.2,
-    padding: 0
+    height: 25 / 1.1,
+    resizeMode: 'contain'
   },
   textInputView: {
     alignItems: 'flex-start',
@@ -176,12 +224,12 @@ const styles = StyleSheet.create({
   textView: {
     alignItems: 'flex-start',
     justifyContent: 'center',
-    width: Dimensions.get('window').width -85,
-    marginRight:85
+    width: Dimensions.get('window').width - 85,
+    marginRight: 85
     ,
   },
   instructionText: {
-    marginLeft:Dimensions.get('window').width *32 / 375,
+    marginLeft: Dimensions.get('window').width * 32 / 375,
     fontFamily: 'Cairo-Bold',
     fontSize: 14
     ,
@@ -193,6 +241,14 @@ const styles = StyleSheet.create({
   smallTextUnderLine: {
     fontFamily: 'Cairo-Bold',
     fontSize: 12,
+  },
+  errorText: {
+    color: 'red',
+    fontFamily: 'Cairo-Bold',
+    fontSize: 12,
+    paddingHorizontal: 10,
+    width: Dimensions.get('window').width * (343) / 375,
+
   }
 });
 const mapStateToProps = state => ({

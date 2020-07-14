@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View, StatusBar, Dimensions, SafeAreaView } from 'react-native';
-
+// import { StatusBar } from 'expo-status-bar';
 /*screens */
 import Navigation from './containers/Navigation/Navigation'
 /* redux */
@@ -34,6 +34,9 @@ export default class App extends React.Component {
   }
   componentDidMount() {
     // store.dispatch(getProducts())
+
+    // console.log( StatusBar);
+
   }
   render() {
     if (!this.state.dataLoaded) {
@@ -42,25 +45,31 @@ export default class App extends React.Component {
         <AppLoading
           startAsync={fetchFonts}
           onFinish={() => { this.setState({ dataLoaded: true }) }}
+          // style={styles.container}
         />
 
       )
     }
     return (
-      <View style={styles.container}>
-        <StatusBar
+      <SafeAreaView style={styles.container}>
+        
+          <StatusBar
+          //  style="light"
           // hidden={true}
           backgroundColor={colors.primary}
           barStyle="dark-content"
           drawBehind={true}
-          visible={false}
+          // visible={true}
+          // backgroundColor={colors.primary}
+          // translucent
+          // showHideTransition= 'slide'
 
-        />
-        <Provider store={store}>
-          <Navigation />
-        </Provider>
-
-      </View >
+          />
+          <Provider store={store}>
+            <Navigation />
+          </Provider>
+       
+       </SafeAreaView >
     );
   }
 }
@@ -68,9 +77,12 @@ export default class App extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    height: Dimensions.get('window').height,
-    backgroundColor: '#ccc',
+    // height: Dimensions.get('window').height+Expo.Constants.statusBarHeight,
+    width:Dimensions.get('window').width,
+    // backgroundColor: '#ccc',
     // alignItems: 'center',
     justifyContent: 'center',
+    // marginTop: Expo.Constants.statusBarHeight,
+    // marginBottom: Expo.Constants.statusBarHeight,
   },
 });

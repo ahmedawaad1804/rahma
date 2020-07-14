@@ -16,8 +16,23 @@ export default authService = {
             .post('/auth/sendOtp', { phoneNumber});
     },
     verifyOTP: async (phoneNumber,OTP) => {
+        
         return axiosInstance
             .post('/auth/verfiyOtp', { phoneNumber,OTP});
+    },
+    resetPassword: async (phoneNumber,OTP,password) => {
+        return axiosInstance
+            .post('/auth/rest/password', { phoneNumber,OTP,password});
+    },
+    checkFaceBookUser: async (faceBookId) => {
+        return axiosInstance
+            .post('/auth/check/facebook', { faceBookId});
+    },
+    signUpFaceBookUser: async (phoneNumber,obj) => {
+        console.log(obj);
+        
+        return axiosInstance
+            .post('/auth/signUp/facebook', { phoneNumber,faceBookId:obj.userData.id,username:obj.userData.name,faceBookToken:obj.token,imageName:obj.fbImage});
     },
 
 }

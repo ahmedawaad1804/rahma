@@ -4,26 +4,37 @@ export default dataService = {
     getProducts: ( ) => {
         
         return axiosInstance
-            .get('/auth/products');
+            .get('/product/getAllProduct');
     },
     getBestSeller: ( ) => {
         
         return axiosInstance
-            .get('/auth/bestSeller');
+            .get('/offers/bestSeller');
     },
     getCategory: ( ) => {
         
         return axiosInstance
-            .get('/auth/category');
+            .get('/offers/category');
     },
     getSubCategoryItems: ( mainCategory,category) => {
         
         return axiosInstance
-            .post('/auth/categoryItems',{mainCategory,category});
+            .post('/offers/categoryItems',{mainCategory,category});
     },
     search: ( text) => {
         
         return axiosInstance
-            .post('/auth/handleSearch',{text});
+            .post('/offers/handleSearch',{text});
     },
+    getCategory3000: ( ) => {
+        
+        return axiosInstance
+            .get('/category/category');
+    },
+    getAdress: ( ) => {
+        
+        return axiosInstance
+            .get('/offers/adress');
+    },
+
 }

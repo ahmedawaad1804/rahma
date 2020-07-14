@@ -4,16 +4,21 @@ import { createSwitchNavigator, createStackNavigator, createMaterialTopTabNaviga
 import MainScreenLoading from '../MainScreenLoading/MainScreenLoading'
 import InitialLoading from '../InitialLoading/InitialLoading'
 import Login from '../Login/Login'
+import Profile from '../Profile/Profile'
 import Selection from '../Selection/Selection'
 import Forgot from '../Forgot/Forgot'
 import NewPass from '../NewPass/NewPass'
 import Register from '../Register/Register'
 import Verification from '../Verification/Verification'
+import VerificationReset from '../VerificationReset/VerificationReset'
 import Home from '../Home/Home'
 import JBHome from '../JBHome/JBHome'
 import productInfo from '../ProductInfo/ProductInfo'
 import MainCategory from '../MainCategory/MainCategory'
+import Adress from '../Adress/Adress'
+import AddAdress from '../AddAdress/AddAdress'
 import SubCategory from '../SubCategory/SubCategory'
+import VerifyFBSignUp from '../VerifyFBSignUp/VerifyFBSignUp'
 import Orders from '../Orders/Orders'
 import Favorites from '../Favorites/Favorites'
 import SearchResults from "../SearchResults/SearchResults"
@@ -35,7 +40,7 @@ const MainTabNavigator = createBottomTabNavigator({
         screen: HomeStack, navigationOptions: {
             showIcon: true,
             tabBarIcon: ({ focused, tintColor }) => {
-                const iconSrc = focused ? require('../../assets/tabIcons/home-outline.png') : require('../../assets/tabIcons/home-outline.png')
+                const iconSrc = focused ? require('../../assets/tabIcons/home.png') : require('../../assets/tabIcons/home-outline.png')
                 return <Image source={iconSrc} style={{ height: (57/3), width: (61/3) }} />;
             },
         },
@@ -59,7 +64,7 @@ const MainTabNavigator = createBottomTabNavigator({
         },
     },
     Profile: {
-        screen: Home, navigationOptions: {
+        screen: Profile, navigationOptions: {
             showIcon: true,
             tabBarIcon: ({ focused, tintColor }) => {
                 const iconSrc = focused ? require('../../assets/tabIcons/profile.png') : require('../../assets/tabIcons/profile-outline.png')
@@ -87,7 +92,9 @@ const MainTabNavigator = createBottomTabNavigator({
 const MainStack = createStackNavigator({
     MainTabNavigator: { screen: MainTabNavigator, navigationOptions: { header: null } },
     productInfo,
-   Cart
+   Cart,
+   Adress,
+   AddAdress
 
     
 })
@@ -97,7 +104,9 @@ const AuthStack = createStackNavigator({
     Forgot,
     NewPass,
     Register,
-    Verification
+    Verification,
+    VerificationReset,
+    VerifyFBSignUp
 })
 const switchNavigator = createSwitchNavigator(
     {
