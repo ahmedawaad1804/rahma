@@ -13,34 +13,45 @@ import { connect } from 'react-redux'
 import dataService from '../../services/dataService'
 /* storage */
 import { AsyncStorage } from 'react-native';
-import { getToken } from '../../utility/storage'
+import { getToken, removeToken } from '../../utility/storage'
+import authService from '../../services/authService';
+/*actions */
+import {setLogin} from '../../actions/loginAction'
 class MainScreenLoading extends React.Component {
 
   async componentDidMount() {
-    const loginStatus = await getToken();
-    console.log(loginStatus);
-    if(loginStatus){
-      this.props.navigation.navigate("JBHome")
-      
-    }
-    dataService.getProducts().then(response => {
-      //save token and navigatexf
-      // console.log(response.data.products);
-      console.log(response.data.products);
-
-      this.props.firstGetProducts(response.data.products)
-      this.props.navigation.navigate("AuthStack")
-
-
-    }
-    ).catch(err => {
-      console.log(err)
-
-    }
-    )
     this.props.getBestSeller()
     this.props.getCategory()
-    this.props.getAdress()
+    const loginStatus = await getToken();
+    console.log(loginStatus);
+    if (loginStatus) {
+      await authService.checkToken().then(async res => {
+        // console.log(res.data.status);
+        if (res.data.status == 'valid') {
+          this.props.setLogin("n")
+
+
+          this.props.navigation.navigate("JBHome")
+        }
+        else {
+          await removeToken()
+          this.props.navigation.navigate("AuthStack")
+        }
+      }).catch(async err => {
+        await removeToken()
+        this.props.navigation.navigate("AuthStack")
+
+      })
+      // check if token available
+      // this.props.navigation.navigate("JBHome")
+
+    }
+    else {
+      await removeToken()
+      this.props.navigation.navigate("AuthStack")
+    }
+    
+    // this.props.getAdress()
 
     this.getCart()
 
@@ -91,7 +102,8 @@ const mapDispatchToProps = {
   getBestSeller,
   getCategory,
   setCartModifications,
-  getAdress
+  getAdress,
+  setLogin
 };
 const mapStateToProps = state => ({
   productsReducer: state.productsReducer,

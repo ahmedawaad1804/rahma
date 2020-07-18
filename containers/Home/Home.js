@@ -15,6 +15,7 @@ import { refreshtProducts, firstGetProducts, setCart } from '../../actions/produ
 import { getCategory } from '../../actions/Category'
 /* services */
 import dataService from '../../services/dataService'
+import likeService from '../../services/likeService'
 /* adv */
 import Adv from '../../components/Ads/Ads'
 /* main category item */
@@ -137,13 +138,16 @@ class Home extends React.Component {
   }
   handleLike(bool, item) {
 
-    console.log(bool);
+    if (bool) {
+        likeService.setLike(item._id).then().catch(err => { console.log(err); })
+    }
+    else {
+        likeService.setDislike(item._id).then().catch(err => { console.log(err); })
 
-    console.log("liked");
-    console.log(item.id);
+    }
 
 
-  }
+}
   _handleSearchButton() {
     if (this.state.searchData.length == 0) {
       // Toast.show("No Search input");

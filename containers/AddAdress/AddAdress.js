@@ -20,6 +20,8 @@ import { Dropdown } from 'react-native-material-dropdown';
 import * as Permissions from 'expo-permissions';
 import * as Location from 'expo-location';
 import Geocoder from 'react-native-geocoding';
+import adressService from '../../services/adressService'
+import dataService from '../../services/dataService';
 class AddAdress extends React.Component {
     state = {
         country: "Egypt",
@@ -85,7 +87,15 @@ class AddAdress extends React.Component {
                     city,
                     country,
                     current: false
-                })
+                },
+                    
+                    
+                    // console.log("any")
+                    setTimeout(() => {
+                    dataService.addAdress(this.props.adressReducer).then().catch(err=>console.log(err))
+                        
+                    }, 500)
+                    )
 
             })
             .catch(error =>
@@ -105,6 +115,11 @@ class AddAdress extends React.Component {
                     country: this.state.country,
                     current: false
                 })
+                setTimeout(() => {
+                    dataService.addAdress(this.props.adressReducer).then().catch(err=>console.log(err))
+                        
+                    }, 500)
+                    
         }
         else {
             this.setState({ _error: true })

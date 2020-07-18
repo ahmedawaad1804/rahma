@@ -14,44 +14,84 @@ import { Header } from 'react-navigation';
 import Product from '../../components/Product/Product'
 /* services */
 import dataService from '../../services/dataService'
+import likeService from '../../services/likeService'
+/* utility */
+import { likedHandle } from '../../utility/likedHandle'
+/* action */ 
+import { setUser } from '../../actions/userAction'
+
 class SubCategory extends React.Component {
     state = {
-        _isPressed: "All",
+        _isPressed: -1,
         data: [],
         category: [],
         allData: [],
-        counter:this.props.cartReducer.length,
+        counter: this.props.cartReducer.length,
 
     };
 
 
     static navigationOptions = { header: null }
+    handleCartAddOne(item) {
+        console.log(item);
+        this.props.setCart({
+            item: item, count: 1,
+        })
+        // Toast.show(`${item.productNameEN} added to cart`);
+
+    }
+    handleLike(bool, item) {
+
+        if (bool) {
+            likeService.setLike(item._id).then().catch(err => { console.log(err); })
+        }
+        else {
+            likeService.setDislike(item._id).then().catch(err => { console.log(err); })
+
+        }
+
+
+    }
     handlePress(item) {
         this.props.navigation.navigate("productInfo", { item: item })
 
     }
     getData() {
-        dataService.getSubCategoryItems(this.props.navigation.state.params.mainCategory, this.props.navigation.state.params.items.nameEN).then(response => {
+        dataService.getSubCategoryItems(this.props.navigation.state.params.items._id).then(response => {
+            let tempArr = []
+            if (this.props.userReducer) {
+                tempArr = likedHandle(response.data.products, this.props.userReducer.likes)
+            }
+            else { tempArr = response.data.products }
 
-            this.setState({ allData: response.data }, () => this.setState({ data: this.state.allData }))
+
+            this.setState({ allData: tempArr }, () => {
+
+                this.setState({ data: this.state.allData })
+
+            }
+            )
         }
         ).catch(err => {
             console.log(err);
         })
     }
-    componentDidMount() {
-        // console.log(this.props.navigation.state.params)
-        // console.log(this.props.navigation.state.params.items.subCategory)
-        // console.log("Ffffffffffffff");
-        
-        // console.log(this.props.navigation.state.params.items.name,this.props.navigation.state.params.mainCategory);
-       
-        let temp ,arr= []
+  async  componentDidMount() {
+        if(this.props.userReducer){
+       await  authService.getUserData().then(res => {
+            this.setState({ username:res.data.user.username })
+      
+              this.props.setUser(res.data.user)
+      
+            }).catch(err=>{
+              console.log(err);
+            })}
+        let temp, arr = []
         temp = [...this.props.navigation.state.params.items.subCategory]
         temp.forEach(
-            element=> arr.push(element.nameEN)
+            element => arr.push(element)
         )
-        arr.unshift("All")
+        arr.unshift({ nameEN: "All", _id: -1, nameAR: 'الكل' })
 
 
         this.setState({ category: arr })
@@ -68,14 +108,14 @@ class SubCategory extends React.Component {
     }
     _handlePressOfSubCategory = (item) => {
         this.setState({ _isPressed: item })
-        // console.log(item);
-        if (item == "All") {
+        if (item == -1) {
             this.setState({ data: this.state.allData })
         }
         else {
             let temp = []
             this.state.allData.map(product => {
-                if (product.subCategory == item) { temp.push(product) }
+
+                if (product.subCatygory == item) { temp.push(product) }
             })
             this.setState({ data: temp })
 
@@ -134,13 +174,13 @@ class SubCategory extends React.Component {
                                 this.state.category.map((item, key) => (
 
                                     <TouchableOpacity style={{
-                                        backgroundColor: this.state._isPressed === item ? colors.primary : colors.fade, borderRadius: 40,
+                                        backgroundColor: this.state._isPressed === item._id ? colors.primary : colors.fade, borderRadius: 40,
                                         // width: Dimensions.get('window').width * 343 / (375 * 2),
                                         paddingHorizontal: 20,
                                         height: "100%", alignItems: 'center', justifyContent: 'center', flex: 1, flexDirection: 'row'
                                     }}
-                                        onPress={() => { this._handlePressOfSubCategory(item) }}>
-                                        <Text style={{ fontSize: 16, padding: 10, fontFamily: "Cairo-Regular" }}>{item}</Text>
+                                        onPress={() => { this._handlePressOfSubCategory(item._id) }}>
+                                        <Text style={{ fontSize: 16, padding: 10, fontFamily: "Cairo-Regular" }}>{item.nameEN}</Text>
                                     </TouchableOpacity>
 
 
@@ -166,6 +206,8 @@ class SubCategory extends React.Component {
 
 
                                 <Product handlePress={() => this.handlePress(item)}
+                                    handleLike={(e) => { this.handleLike(e, item) }}
+                                    handleCartAddOne={() => this.handleCartAddOne(item)}
                                     src={item}
                                 />
 
@@ -432,8 +474,11 @@ const styles = StyleSheet.create({
 });
 const mapStateToProps = state => ({
     cartReducer: state.cartReducer,
+    userReducer: state.userReducer,
+
 })
 const mapDispatchToProps = {
     setCart,
+    setUser,
 };
 export default connect(mapStateToProps, mapDispatchToProps)(SubCategory)

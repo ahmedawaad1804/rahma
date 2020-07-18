@@ -25,11 +25,11 @@ class Adress extends React.Component {
 
     static navigationOptions = { header: null }
     componentDidMount() {
-        this.setState({ data: this.props.adressReducer })
-
+        console.log(this.props.adressReducer);
+        this.setState({ data: this.props.adressReducer})
+        // console.log(this.props.userReducer.address);
         this.unsubscribe = store.subscribe(() => {
             setTimeout(() => {
-            console.log(this.props.adressReducer );
 
             this.setState({ data: this.props.adressReducer })
                 
@@ -56,10 +56,18 @@ class Adress extends React.Component {
             })
             this.setState({ data: temp })
         }
+        setTimeout(() => {
+            dataService.addAdress(this.props.adressReducer).then().catch(err=>console.log(err))
+                
+            }, 500)
     }
     deleteAdress(adress) {
         this.state.data.splice(this.state.data.findIndex(obj => obj == adress), 1);
         this.setState({ data: this.state.data })
+        setTimeout(() => {
+            dataService.addAdress(this.props.adressReducer).then().catch(err=>console.log(err))
+                
+            }, 500)
 
     }
     addAdress() {
@@ -293,7 +301,8 @@ const styles = StyleSheet.create({
 
 });
 const mapStateToProps = state => ({
-    adressReducer: state.adressReducer
+    adressReducer: state.adressReducer,
+    userReducer: state.userReducer,
 })
 const mapDispatchToProps = {
 };

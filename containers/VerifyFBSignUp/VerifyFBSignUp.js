@@ -101,6 +101,7 @@ class VerifyFBSignUp extends React.Component {
         }
         )
       }
+      this.setState({ _checkReset: false })
     }, 500);
 
 

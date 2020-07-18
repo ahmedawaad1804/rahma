@@ -4,25 +4,45 @@ import { StyleSheet, Image, View, ActivityIndicator, Dimensions, Text } from 're
 import colors from '../../colors'
 
 import { refreshtProducts, firstGetProducts } from '../../actions/product'
+import { setUser } from '../../actions/userAction'
+import { addAdress,getAdress } from '../../actions/adressAction'
 import store from '../../store'
 import { connect } from 'react-redux'
 
-import dataService from '../../services/dataService'
-
+import authService from '../../services/authService'
+/* token */
+import { getToken } from '../../utility/storage'
 class JBHome extends React.Component {
-state={
-  username:" ",
-  
-}
-  componentDidMount() {
+  state = {
+    username: " ",
 
-    setTimeout(() => {
+  }
+  async componentDidMount() {
 
-      this.props.navigation.navigate("MainStack")
+    let token = await getToken()
+    if (token) {
+      authService.getUserData().then(res => {
+        // this.setState({ username:res.data.user.username })
+        console.log(res.data.user.address);
+        this.props.getAdress(res.data.user.address)
+        this.props.setUser(res.data.user)
+        this.props.navigation.navigate("MainStack")
+
+      }).catch(err => {
+        console.log(err);
+      })
 
 
 
-    }, 3000);
+    }
+    // else{this.setState({username:"not"})}
+
+    // setTimeout(() => {
+
+
+
+
+    // }, 3000);
 
 
   }
@@ -36,7 +56,7 @@ state={
         </View>
         <Text style={{ fontSize: 50, marginLeft: 40, fontFamily: "Cairo-Regular" }}>Welcome ...</Text>
         <View style={{ flexDirection: 'row' }}>
-          <Text style={{ fontSize: 30, marginLeft: 60, marginRight: 40, fontFamily: "Cairo-Regular" }}>{this.state.username}</Text>
+          {/* <Text style={{ fontSize: 30, marginLeft: 60, marginRight: 40, fontFamily: "Cairo-Regular" }}>{this.state.username}</Text> */}
           <ActivityIndicator size={50} color={colors.white} />
         </View>
 
@@ -56,7 +76,10 @@ const styles = StyleSheet.create({
 });
 const mapDispatchToProps = {
   refreshtProducts,
-  firstGetProducts
+  firstGetProducts,
+  setUser,
+  addAdress,
+  getAdress
 };
 const mapStateToProps = state => ({
   loginReducer: state.loginReducer

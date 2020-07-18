@@ -39,7 +39,8 @@ class MainCategory extends React.Component {
         loop: [],
         _isDataLoaded: false,
         refreshing: false,
-        _isLogIn: false
+        _isLogIn: false,
+        user:{},
 
 
     };
@@ -58,6 +59,10 @@ class MainCategory extends React.Component {
         if(this.props.loginReducer){
             this.setState({_isLogIn:true})
         }
+        if (this.props.userReducer) {
+            this.setState({ user: this.props.userReducer })
+        }
+
     }
 
     _handlePress = (item) => {
@@ -284,7 +289,9 @@ const styles = StyleSheet.create({
 const mapStateToProps = state => ({
     loginReducer: state.loginReducer,
     cartReducer: state.cartReducer,
-    productsReducer: state.productsReducer
+    productsReducer: state.productsReducer,
+    userReducer:state.userReducer,
+
 })
 const mapDispatchToProps = {
     setCart,

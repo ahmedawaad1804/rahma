@@ -100,6 +100,29 @@ class Login extends React.Component {
         })
         const userData = await userInfoResponse.json()
         console.log( userData);
+        authService.checkFaceBookUser(userData.id).then(
+          response => {
+            if (response.data.status == "Exist") { 
+              // console.log(response.data.user);
+              setToken(response.data.token)
+              this.props.setLogin("f")
+              this.props.navigation.navigate("JBHome")
+              
+            }
+            else if (response.data.status == "Not Exist") {
+              console.log("Not Exist");
+              
+              this.props.navigation.navigate("VerifyFBSignUp",{userData,token:null,fbImage:userData.picture})
+            }
+
+
+          }
+
+        ).catch(
+          err => {
+            console.log(err);
+          }
+        )
         // .then(res=>res.json())
         // .then(res=>
         //   {

@@ -15,12 +15,12 @@ const cartReducer = (state = INITIAL_STATEA, action) => {
 
         let temp = action.payload
 
-        if (state.find(obj => obj.item.id === action.payload.item.id) != undefined) {
+        if (state.find(obj => obj.item._id === action.payload.item._id) != undefined) {
             temp = {
                 item:action.payload.item,
-                count: action.payload.count + state.find(obj => obj.item.id === action.payload.item.id).count
+                count: action.payload.count + state.find(obj => obj.item._id === action.payload.item._id).count
             }
-            state.splice(state.findIndex(obj => obj.id === action.payload.id), 1, temp);
+            state.splice(state.findIndex(obj => obj._id === action.payload._id), 1, temp);
 
         }
         else { state.push(temp) }

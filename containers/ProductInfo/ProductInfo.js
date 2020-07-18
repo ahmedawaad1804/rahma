@@ -167,7 +167,7 @@ class ProductInfo extends React.Component {
                             <FlatList
                                 showsVerticalScrollIndicator={false}
                                 // contentContainerStyle={styles.grid}
-                                data={this.state.data}
+                                data={this.props.navigation.state.params.item.detailEN}
                                 renderItem={({ item }) => (
 
                                     <Text style={{ flex: 1, padding: 5, fontFamily: 'Cairo-SemiBold' }}>{item}</Text>

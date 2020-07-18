@@ -12,7 +12,9 @@ import FastImage from 'react-native-fast-image'
 
 
 export default Product = (data) => {
-    const [heart, setHeart] = useState(require("../../assets/icons/heart-sq.png"));
+    console.log(data);
+    const [heart, setHeart] =data.src.isliked?  useState(require("../../assets/icons/heart-red.png")):useState(require("../../assets/icons/heart-sq.png"))
+    // if(data.src.isliked){setHeart(require("../../assets/icons/heart-red.png"))}
     const handleChange = bool => {
         
         data.handleLike(bool);
@@ -21,7 +23,7 @@ export default Product = (data) => {
     return (
 
         <View style={styles.productOpacity}>
-            {/* <View style={styles.container}> */}
+            
             <TouchableOpacity onPress={data.handlePress} >
 
                 <Image source={{ uri: data.src.uri }}
@@ -35,7 +37,7 @@ export default Product = (data) => {
             </TouchableOpacity>
             <View style={styles.textHolder}>
                 <Text style={styles.productNameFont}>{data.src.productNameEN} </Text>
-                <Text style={styles.descriptionFont}>{data.src.description}</Text>
+                <Text style={styles.descriptionFont}>{data.src.descriptionEN}</Text>
                 <View style={{ flexDirection: 'row' }}>
                     <View>
                         <Text style={styles.price}>{data.src.price} EGP</Text>

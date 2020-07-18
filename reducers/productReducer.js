@@ -7,6 +7,7 @@ import bestsellerReducer from "./bestSeller"
 import categoryReducer from "./Category"
 import adressReducer from "./adressReducer"
 import loginReducer from "./loginReducer"
+import userReducer from "./userReducer"
 
 
 
@@ -17,7 +18,8 @@ const reducer = combineReducers({
     bestsellerReducer,
     categoryReducer,
     adressReducer,
-    loginReducer
+    loginReducer,
+    userReducer
 })
 
 export default reducer

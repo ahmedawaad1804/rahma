@@ -16,10 +16,11 @@ export default dataService = {
         return axiosInstance
             .get('/offers/category');
     },
-    getSubCategoryItems: ( mainCategory,category) => {
+    // waiting
+    getSubCategoryItems: ( productCatId) => {
         
         return axiosInstance
-            .post('/offers/categoryItems',{mainCategory,category});
+            .post('/product/CatProduct',{productCatId});
     },
     search: ( text) => {
         
@@ -31,10 +32,15 @@ export default dataService = {
         return axiosInstance
             .get('/category/category');
     },
-    getAdress: ( ) => {
-        
+    // waiting
+    addAdress: (address) => {
+// console.log("adress sent");
         return axiosInstance
-            .get('/offers/adress');
+            .post('/client/addAddress',{address});
     },
+
+   
+    
+
 
 }

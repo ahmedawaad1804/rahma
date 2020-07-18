@@ -14,6 +14,7 @@ import { Header } from 'react-navigation';
 import { getToken, removeToken } from '../../utility/storage'
 /* action */
 import { setLogout } from '../../actions/loginAction'
+import { removeUser } from '../../actions/userAction'
 class Profile extends React.Component {
     static navigationOptions = { header: null }
     state = {
@@ -23,7 +24,8 @@ class Profile extends React.Component {
         loop: [],
         _isDataLoaded: false,
         refreshing: false,
-        _isLogIn: true//
+        _isLogIn: false,
+        user:{}
 
 
     };
@@ -31,16 +33,15 @@ class Profile extends React.Component {
         this.props.navigation.navigate("Adress")
     }
     componentDidMount() {
-        store.subscribe(() => {
-            this.setState({ counter: this.props.cartReducer.length })
-            console.log("subscribed");
-
-
-        });
+      
         this.setState({ loop: this.state.orders })
+        // console.log(this.props.userReducer);
         this.setState({ _isDataLoaded: true })
         if (this.props.loginReducer) {
             this.setState({ _isLogIn: true })
+        }
+        if (this.props.userReducer) {
+            this.setState({ user: this.props.userReducer })
         }
 
     }
@@ -55,6 +56,8 @@ class Profile extends React.Component {
     async logout() {
         await removeToken()
         this.props.setLogout()
+        this.props.removeUser()
+
         this.props.navigation.navigate("MainScreenLoading")
 
     }
@@ -65,14 +68,15 @@ class Profile extends React.Component {
                 {this.state._isLogIn && <View style={styles.headerContainer}>
 
                     <View style={styles.imageContainer}>
-                        <Image source={require("../../assets/awaad.png")}
+                        <Image source={{uri:this.state.user.imageName}}
+                        onError={() => this.setState({error: true})}
                             style={styles.mainImageStyle} />
                     </View>
-                    <Text style={{ fontFamily: 'Cairo-SemiBold', fontSize: 22 }}>Diana khaled</Text>
+                    <Text style={{ fontFamily: 'Cairo-SemiBold', fontSize: 22 }}>{this.state.user.username}</Text>
                     <View style={styles.phoneIconContainer}>
                         <Image source={require("../../assets/icons/phone.png")}
                             style={styles.phoneIcon} />
-                        <Text style={{ fontFamily: 'Cairo-Regular', fontSize: 12 }}> (02) 01101102604</Text>
+                        <Text style={{ fontFamily: 'Cairo-Regular', fontSize: 12 }}> (02) 0{this.state.user.phoneNumber}</Text>
                     </View>
 
 
@@ -321,10 +325,12 @@ const styles = StyleSheet.create({
 });
 const mapStateToProps = state => ({
     cartReducer: state.cartReducer,
-    loginReducer:state.loginReducer
+    loginReducer:state.loginReducer,
+    userReducer:state.userReducer,
 })
 const mapDispatchToProps = {
     setCart,
-    setLogout
+    setLogout,
+    removeUser
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Profile)

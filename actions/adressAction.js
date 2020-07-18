@@ -12,30 +12,22 @@ import dataService from '../services/dataService'
 //action creator
 
 
-export const getAdress = () => dispatch => {
+export const getAdress = (data) => dispatch => {
     
-    dataService.getAdress().then(response => {
-        
+  
         dispatch({
             type: 'SET_ADRESS',
-            payload: response.data
+            payload: data
         })
 
-    }
-    ).catch(err => {
-        dispatch({
-            type: 'SET_ADRESS_FAILED',
-            
-        })
-
-    })
+  
 
 
 
 
 }
 export const addAdress = (data) => dispatch => {
-   
+//    console.log(data);
         dispatch({
             type: 'ADD_ADRESS',
             payload: data
