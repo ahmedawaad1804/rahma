@@ -17,6 +17,7 @@ axiosInstance.interceptors.request.use(async config => {
         config.headers.authorization = `Bearer ${auth}`;
         return config;
     }
+    config.headers["api-key"]="testtest"
     return config;
 }, error => {
     return Promise.reject(error);

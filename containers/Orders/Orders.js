@@ -34,7 +34,7 @@ class MainCategory extends React.Component {
             { status: "cancelled", orderNumber: 26, items: 9, price: 18 },
             { status: "cancelled", orderNumber: 26, items: 9, price: 18 },
         ],
-        counter: 0,
+        counter: this.props.cartReducer.length,
         _isPressed: 0,
         loop: [],
         _isDataLoaded: false,
@@ -48,7 +48,7 @@ class MainCategory extends React.Component {
     componentDidMount() {
         store.subscribe(() => {
             this.setState({ counter: this.props.cartReducer.length })
-            console.log("subscribed");
+            // console.log("subscribed");
 
 
         });

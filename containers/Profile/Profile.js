@@ -25,7 +25,8 @@ class Profile extends React.Component {
         _isDataLoaded: false,
         refreshing: false,
         _isLogIn: false,
-        user:{}
+        user: {},
+        adress: []
 
 
     };
@@ -33,7 +34,16 @@ class Profile extends React.Component {
         this.props.navigation.navigate("Adress")
     }
     componentDidMount() {
-      
+        this.setState({ adress: this.props.adressReducer })
+        this.unsubscribe = store.subscribe(() => {
+            console.log("update");
+            setTimeout(() => {
+                this.setState({ adress: this.props.adressReducer })
+
+            }, 400);
+
+
+        });
         this.setState({ loop: this.state.orders })
         // console.log(this.props.userReducer);
         this.setState({ _isDataLoaded: true })
@@ -44,6 +54,9 @@ class Profile extends React.Component {
             this.setState({ user: this.props.userReducer })
         }
 
+    }
+    componentWillUnmount() {
+        this.unsubscribe();
     }
 
 
@@ -68,8 +81,8 @@ class Profile extends React.Component {
                 {this.state._isLogIn && <View style={styles.headerContainer}>
 
                     <View style={styles.imageContainer}>
-                        <Image source={{uri:this.state.user.imageName}}
-                        onError={() => this.setState({error: true})}
+                        <Image source={{ uri: this.state.user.imageName }}
+                            onError={() => this.setState({ error: true })}
                             style={styles.mainImageStyle} />
                     </View>
                     <Text style={{ fontFamily: 'Cairo-SemiBold', fontSize: 22 }}>{this.state.user.username}</Text>
@@ -91,8 +104,15 @@ class Profile extends React.Component {
                                 style={styles.phoneIcon} />
                         </View>
                         <View style={{ flex: 7.5, }}>
-                            <Text style={{ fontFamily: 'Cairo-Regular', fontSize: 14 }}>Adress</Text>
-                            <Text style={{ fontFamily: 'Cairo-Regular', fontSize: 12 }}>13 El-Jasmin, Fleming, Qism El-Raml, Alexandria Governorate</Text>
+                            {
+                                this.state.adress ?
+                                    this.state.adress.map(item => {
+                                        if (item.current) {
+                                            // console.log(item);
+                                            // console.log("item");
+                                            return <Text style={{ fontFamily: 'Cairo-Regular', fontSize: 12 }}>{item.street} {item.route} {item.neighbourhood} {item.administrative_area} {item.city}</Text>
+                                        }
+                                    }) : <Text>No adress yet</Text>}
                         </View>
                         <View style={{ flex: 2.5, alignItems: 'center', flexDirection: 'row' }}>
                             <Text style={{ fontFamily: 'Cairo-Regular', fontSize: 13 }}>Manage  </Text>
@@ -325,8 +345,9 @@ const styles = StyleSheet.create({
 });
 const mapStateToProps = state => ({
     cartReducer: state.cartReducer,
-    loginReducer:state.loginReducer,
-    userReducer:state.userReducer,
+    loginReducer: state.loginReducer,
+    userReducer: state.userReducer,
+    adressReducer: state.adressReducer,
 })
 const mapDispatchToProps = {
     setCart,

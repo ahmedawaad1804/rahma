@@ -8,7 +8,6 @@ export const GET_CATEGORY = 'GET_CATEGORY'
 export const getCategory = () => dispatch => {
 
     dataService.getCategory3000().then(response => {
-console.log(response.data);
 
         dispatch({
             type: 'GET_CATEGORY',

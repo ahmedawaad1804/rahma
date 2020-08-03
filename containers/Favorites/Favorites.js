@@ -27,7 +27,8 @@ class Favorites extends React.Component {
         _isPressed: "All",
         _isDataLoaded: false,
         refreshing: false,
-        _isLogIn: true
+        _isLogIn: false,
+        user: {}
 
 
     };
@@ -35,13 +36,18 @@ class Favorites extends React.Component {
     componentDidMount() {
         store.subscribe(() => {
             this.setState({ counter: this.props.cartReducer.length })
-            console.log("subscribed");
+            // console.log("subscribed");
 
 
         });
         this.setState({ itemData: this.props.productsReducer })
         this.setState({ _isDataLoaded: true })
-        /// test
+        if (this.props.loginReducer) {
+            this.setState({ _isLogIn: true })
+        }
+        if (this.props.userReducer) {
+            this.setState({ user: this.props.userReducer })
+        }
 
     }
 
@@ -99,110 +105,109 @@ class Favorites extends React.Component {
 
                 </View>
 
-                {this.state._isLogIn && this.state._isDataLoaded &&
-                < View style={styles.mainContainer}>
+                {this.state._isLogIn &&
+                    < View style={styles.mainContainer}>
 
 
 
 
 
-                <View>
-                    <View style={{ justifyContent: 'center', height: Dimensions.get('window').height * 46 / 812, alignItems: 'center', marginBottom: 15, paddingHorizontal: 20, }}>
-                        <ScrollView style={{ backgroundColor: colors.fade, borderRadius: 40 }} horizontal={true} showsHorizontalScrollIndicator={false}>
-                            {
-                                this.state.category.map((item, key) => (
+                        <View>
+                            <View style={{ justifyContent: 'center', height: Dimensions.get('window').height * 46 / 812, alignItems: 'center', marginBottom: 15, paddingHorizontal: 20, }}>
+                                <ScrollView style={{ backgroundColor: colors.fade, borderRadius: 40 }} horizontal={true} showsHorizontalScrollIndicator={false}>
+                                    {
+                                        this.state.category.map((item, key) => (
 
-                                    <TouchableOpacity style={{
-                                        backgroundColor: this.state._isPressed === item ? colors.primary : colors.fade, borderRadius: 40,
-                                        // width: Dimensions.get('window').width * 343 / (375 * 2),
-                                        paddingHorizontal: 20,
-                                        height: "100%", alignItems: 'center', justifyContent: 'center', flex: 1, flexDirection: 'row'
-                                    }}
-                                        onPress={() => { this._handlePress(item) }}>
-                                        <Text style={{ fontSize: 16, padding: 10, fontFamily: "Cairo-Regular" }}>{item}</Text>
-                                    </TouchableOpacity>
-
-
-                                )
-
-                                )
-                            }
-                        </ScrollView>
-                    </View>
-
-                    <View>
-                        <FlatList
-                            // disableVirtualization={false}
-                            showsVerticalScrollIndicator={false}
-                            maxToRenderPerBatch={20}
-                            updateCellsBatchingPeriod={20}
-                            legacyImplementation={false}
-                            initialNumToRender={50}
-                            keyExtractor={(item) => item.toString()}
-                            // initialNumToRender={50}
-                            // ItemSeparatorComponent = { (<View><Text>asdf</Text></View>) }
-                            contentContainerStyle={{ paddingBottom: 100 }}
-                            data={this.state.itemData}
-
-                            renderItem={({ item }) => (
-
-                                // <Text>sd</Text>
-                                <Product
-                                    handlePress={() => this.handlePress(item)}
-                                    src={item}
+                                            <TouchableOpacity style={{
+                                                backgroundColor: this.state._isPressed === item ? colors.primary : colors.fade, borderRadius: 40,
+                                                // width: Dimensions.get('window').width * 343 / (375 * 2),
+                                                paddingHorizontal: 20,
+                                                height: "100%", alignItems: 'center', justifyContent: 'center', flex: 1, flexDirection: 'row'
+                                            }}
+                                                onPress={() => { this._handlePress(item) }}>
+                                                <Text style={{ fontSize: 16, padding: 10, fontFamily: "Cairo-Regular" }}>{item}</Text>
+                                            </TouchableOpacity>
 
 
+                                        )
 
+                                        )
+                                    }
+                                </ScrollView>
+                            </View>
+
+                            <View>
+                                <FlatList
+                                    // disableVirtualization={false}
+                                    showsVerticalScrollIndicator={false}
+                                    maxToRenderPerBatch={20}
+                                    updateCellsBatchingPeriod={20}
+                                    legacyImplementation={false}
+                                    initialNumToRender={50}
+                                    keyExtractor={(item) => item.toString()}
+                                    // initialNumToRender={50}
+                                    // ItemSeparatorComponent = { (<View><Text>asdf</Text></View>) }
+                                    contentContainerStyle={{ paddingBottom: 100 }}
+                                    data={this.state.itemData}
+
+                                    renderItem={({ item }) => (
+
+                                        // <Text>sd</Text>
+                                        <Product
+                                            handlePress={() => this.handlePress(item)}
+                                            src={item}
+
+
+
+                                        />
+                                    )}
+                                    refreshControl={
+                                        <RefreshControl
+                                            refreshing={this.state.refreshing}
+                                            onRefresh={this.onRefresh}
+                                        />
+                                    }
+                                    style={{ width: '100%' }}
+                                    keyExtractor={(item, index) => index}
+                                    horizontal={false}
+                                    numColumns={2}
                                 />
-                            )}
-                            refreshControl={
-                                <RefreshControl
-                                    refreshing={this.state.refreshing}
-                                    onRefresh={this.onRefresh}
-                                />
-                            }
-                            style={{ width: '100%' }}
-                            keyExtractor={(item, index) => index}
-                            horizontal={false}
-                            numColumns={2}
-                        />
 
 
 
+                            </View>
+                        </View>
+
+
+
+
+                    </View>}
+
+                {!this.state._isLogIn && <View style={[styles.mainContainer, { justifyContent: 'center' }]}>
+                    <View style={{ alignItems: 'flex-start', width: "100%" }}>
+                        <Text style={styles.headerText}>You arn't logged in</Text>
+                        <Text style={styles.instructionText}>Please log in</Text>
                     </View>
+                    <TouchableOpacity style={styles.tOpacity}
+                        // disabled={this.state._ckeckSignIn}
+                        onPress={() => this._handleLogin()}>
+                        <Text style={styles.text}>Login</Text>
+
+
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.tOpacity}
+                        // disabled={this.state._ckeckSignIn}
+                        onPress={() => this._handleRegister()}>
+                        <Text style={styles.text}>Register</Text>
+
+
+                    </TouchableOpacity>
+
+
                 </View>
 
-
-
-
-            </View>}
-
-                   {
-    this.state._isLogIn && !this.state._isDataLoaded && <View style={[styles.mainContainer, { justifyContent: 'center' }]}>
-        <View style={{ alignItems: 'flex-start', width: "100%" }}>
-            <Text style={styles.headerText}>You arn't logged in</Text>
-            <Text style={styles.instructionText}>Please log in</Text>
-        </View>
-        <TouchableOpacity style={styles.tOpacity}
-            // disabled={this.state._ckeckSignIn}
-            onPress={() => this._handleLogin()}>
-            <Text style={styles.text}>Login</Text>
-
-
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.tOpacity}
-            // disabled={this.state._ckeckSignIn}
-            onPress={() => this._handleRegister()}>
-            <Text style={styles.text}>Register</Text>
-
-
-        </TouchableOpacity>
-
-
-    </View>
-
-}
+                }
             </View >
 
 
@@ -273,9 +278,10 @@ const styles = StyleSheet.create({
     },
 });
 const mapStateToProps = state => ({
-    www: state.www,
     cartReducer: state.cartReducer,
-    productsReducer: state.productsReducer
+    productsReducer: state.productsReducer,
+    userReducer: state.userReducer,
+    loginReducer: state.loginReducer,
 })
 const mapDispatchToProps = {
     setCart,

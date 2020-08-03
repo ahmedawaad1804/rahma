@@ -4,6 +4,8 @@ import store from '../../store'
 import { connect } from 'react-redux'
 /* colors */
 import colors from '../../colors'
+/* spinner */
+import Spinner from 'react-native-loading-spinner-overlay';
 /* padge */
 import { Avatar, Badge, Icon, withBadge } from 'react-native-elements'
 import { setCartModifications } from '../../actions/product'
@@ -14,6 +16,8 @@ import { Header } from 'react-navigation';
 import CartItem from '../../components/CartItem/CartItem'
 /* storage */
 import { AsyncStorage } from 'react-native';
+import dataService from '../../services/dataService';
+import orderService from "../../services/orderService"
 class Cart extends React.Component {
     static navigationOptions = { header: null }
 
@@ -23,7 +27,10 @@ class Cart extends React.Component {
         cost: 0,
         VAT: 0,
         deliveryCost: 0,
-        total: 0
+        total: 0,
+        visible: false,
+        errorMessage: " ",
+        _error: false,
     };
 
     componentDidMount() {
@@ -34,7 +41,7 @@ class Cart extends React.Component {
 
     _increase(item) {
 
-        this.state.data.find(obj => obj.item.id == item.item.id).count++
+        this.state.data.find(obj => obj.item._id == item.item._id).count++
         this.setState({ data: this.state.data })
         this.props.setCartModifications(this.state.data)
         this.calculate()
@@ -43,8 +50,8 @@ class Cart extends React.Component {
 
     }
     _decrease(item) {
-        if (this.state.data.find(obj => obj.item.id == item.item.id).count > 0) {
-            this.state.data.find(obj => obj.item.id == item.item.id).count--
+        if (this.state.data.find(obj => obj.item._id == item.item._id).count > 0) {
+            this.state.data.find(obj => obj.item._id == item.item._id).count--
             this.setState({ data: this.state.data })
             this.props.setCartModifications(this.state.data)
             this.calculate()
@@ -53,7 +60,7 @@ class Cart extends React.Component {
 
     }
     _delete(item) {
-        this.state.data.splice(this.state.data.findIndex(obj => obj.item.id == item.item.id), 1);
+        this.state.data.splice(this.state.data.findIndex(obj => obj.item._id == item.item._id), 1);
         this.setState({ data: this.state.data })
         this.calculate()
     }
@@ -66,12 +73,49 @@ class Cart extends React.Component {
         })
         this.setState({ cost: sum })
     }
+    continue() {
+        // if(this.state.data.length){
+        this.setState({ visible: true })
+        // console.log(this.props.cartReducer);
+        // console.log(this.state.data);
+        let temp = []
+        this.state.data.map(item => {
+            temp.push({
+                productId: item.item._id,
+                quantity: item.count,
+                productNameEN: item.item.productNameEN,
+                productNameAR: item.item.productNameAR
+            })
+        })
+        orderService.checkOrder(temp).then(response => {
+            // console.log(response.data);
+            if (response.data.notFound.length == 0) {
+                this.props.navigation.navigate("CartProgress")
+            }
+            else {
+                let itemsError = ""
+                response.data.notFound.forEach(element => {
+                    itemsError += element.productNameEN
+                });
+                this.setState({ errorMessage: "Item(s) " + itemsError + " not found" })
+                // console.log("Item(s) "+itemsError+ " not found");
+            }
+        }).catch(err => {
+            this.setState({ errorMessage: err.response.data.status })
+        })
+
+        // this.props.navigation.navigate("CartProgress")
+        this.setState({ visible: false })
+
+
+        // }
+    }
     async save() {
         try {
             await AsyncStorage.setItem(
                 'cart', JSON.stringify(this.props.cartReducer)
             );
-            
+
             // Toast.show("Cart Saved");
 
         } catch (error) {
@@ -86,6 +130,9 @@ class Cart extends React.Component {
     render() {
         return (
             <View style={styles.container}>
+                <View style={{ flex: 1 }}>
+                    <Spinner visible={this.state.visible} textContent={"Loading..."} textStyle={{ color: colors.white }} />
+                </View>
                 <View style={styles.headerContainer}>
 
                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -119,7 +166,7 @@ class Cart extends React.Component {
 
                 <View style={styles.mainContainer}>
                     <View style={{ alignItems: "center", flex: 1 }}>
-
+                        <Text style={styles.errorText}>{this.state.errorMessage}</Text>
 
                         <FlatList
 
@@ -129,16 +176,6 @@ class Cart extends React.Component {
                             contentContainerStyle={styles.grid}
                             data={this.state.data}
                             renderItem={({ item }) =>
-
-
-
-
-
-
-
-
-
-
                                 <View style={styles.orderOpacity}>
                                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                                         <Image
@@ -211,13 +248,13 @@ class Cart extends React.Component {
                         <View style={{ flex: 3, flexDirection: 'row' }}>
                             <View style={{ flex: 2, justifyContent: 'center', alignItems: 'flex-end', paddingRight: 5 }}>
                                 <Text style={{ fontSize: 14, fontFamily: "Cairo-Regular" }}>Products cost</Text>
-                                <Text style={{ fontSize: 14, fontFamily: "Cairo-Regular" }}>VAT 12%</Text>
-                                <Text style={{ fontSize: 14, fontFamily: "Cairo-Regular" }}>Delivery</Text>
+                                {/* <Text style={{ fontSize: 14, fontFamily: "Cairo-Regular" }}>VAT 12%</Text>
+                                <Text style={{ fontSize: 14, fontFamily: "Cairo-Regular" }}>Delivery</Text> */}
                             </View>
                             <View style={{ flex: 2, justifyContent: 'center', alignItems: 'flex-start', paddingLeft: 5 }}>
                                 <Text style={{ fontSize: 14, fontFamily: "Cairo-Regular" }}>EGP {this.state.cost}</Text>
-                                <Text style={{ fontSize: 14, fontFamily: "Cairo-Regular" }}>EGP {this.state.VAT}</Text>
-                                <Text style={{ fontSize: 14, fontFamily: "Cairo-Regular" }}>EGP {this.state.deliveryCost}</Text>
+                                {/* <Text style={{ fontSize: 14, fontFamily: "Cairo-Regular" }}>EGP {this.state.VAT}</Text>
+                                <Text style={{ fontSize: 14, fontFamily: "Cairo-Regular" }}>EGP {this.state.deliveryCost}</Text> */}
                             </View>
                             <View style={{ flex: 2, justifyContent: 'center', alignItems: 'center', }}>
                                 <Text style={{ fontSize: 14, fontFamily: "Cairo-Regular" }}>Total Cost</Text>
@@ -334,6 +371,14 @@ const styles = StyleSheet.create({
         height: "90%",
         width: "100%",
         resizeMode: 'contain'
+    },
+    errorText: {
+        color: 'red',
+        fontFamily: 'Cairo-Bold',
+        fontSize: 12,
+        paddingHorizontal: 10,
+        width: Dimensions.get('window').width * (343) / 375,
+
     }
 });
 const mapStateToProps = state => ({

@@ -23,7 +23,7 @@ class JBHome extends React.Component {
     if (token) {
       authService.getUserData().then(res => {
         // this.setState({ username:res.data.user.username })
-        console.log(res.data.user.address);
+        // console.log(res.data);
         this.props.getAdress(res.data.user.address)
         this.props.setUser(res.data.user)
         this.props.navigation.navigate("MainStack")

@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import colors from '../../colors'
 /* padge */
 import { Avatar, Badge, Icon, withBadge } from 'react-native-elements'
-import { setCart } from '../../actions/product'
+import { getAdress } from '../../actions/adressAction'
 import { Header } from 'react-navigation';
 /* toast */
 // import Toast from 'react-native-simple-toast';
@@ -33,7 +33,7 @@ class Adress extends React.Component {
 
             this.setState({ data: this.props.adressReducer })
                 
-            }, 150);
+            }, 200);
 
 
         });
@@ -44,7 +44,7 @@ class Adress extends React.Component {
 
 
     makeCurrent(adress) {
-        console.log(adress);
+        // console.log(adress);
         if (!adress.current) {
             let temp = []
             this.state.data.forEach(obj => {
@@ -54,7 +54,7 @@ class Adress extends React.Component {
                 else { obj.current = true }
                 temp.push(obj)
             })
-            this.setState({ data: temp })
+            this.setState({ data: temp },this.props.getAdress(this.state.data) )
         }
         setTimeout(() => {
             dataService.addAdress(this.props.adressReducer).then().catch(err=>console.log(err))
@@ -63,7 +63,7 @@ class Adress extends React.Component {
     }
     deleteAdress(adress) {
         this.state.data.splice(this.state.data.findIndex(obj => obj == adress), 1);
-        this.setState({ data: this.state.data })
+        this.setState({ data: this.state.data },this.props.getAdress(this.state.data))
         setTimeout(() => {
             dataService.addAdress(this.props.adressReducer).then().catch(err=>console.log(err))
                 
@@ -305,5 +305,6 @@ const mapStateToProps = state => ({
     userReducer: state.userReducer,
 })
 const mapDispatchToProps = {
+    getAdress
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Adress)

@@ -23,6 +23,8 @@ import Orders from '../Orders/Orders'
 import Favorites from '../Favorites/Favorites'
 import SearchResults from "../SearchResults/SearchResults"
 import Cart from "../Cart/Cart"
+import CartProgress from '../CartProgress/CartProgress'
+import Payment from "../Payment/Payment"
 import { createAppContainer } from "react-navigation";
 /* colors */
 import colors from '../../colors'
@@ -94,7 +96,9 @@ const MainStack = createStackNavigator({
     productInfo,
    Cart,
    Adress,
-   AddAdress
+   AddAdress,
+   CartProgress,
+   Payment
 
     
 })
