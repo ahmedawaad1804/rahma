@@ -2,7 +2,7 @@ import React from 'react';
 /* services */
 import authService from '../../services/authService'
 
-import { StyleSheet, Text, View, CheckBox, ActivityIndicator,KeyboardAvoidingView, TouchableHighlight, Button, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, CheckBox, ActivityIndicator,KeyboardAvoidingView, TouchableHighlight, Button, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, ImageBackground, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import store from '../../store'
 import { connect } from 'react-redux'
 /* colors */
@@ -57,10 +57,7 @@ class Register extends React.Component {
   });
 
   _handleUsername(username) {
-    this.setState({ username })
-    this.setState({ _error: false })
-
-    this.setState({ errorMessage: " " })
+    this.setState({ username, _error: false, errorMessage: " "  })
   }
   _handlePassword(password) {
     this.setState({ password })
@@ -182,8 +179,10 @@ class Register extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <KeyboardAvoidingView keyboardVerticalOffset={-Dimensions.get('window').height*20/812} behavior='height'  style={styles.mainContainer}>
-          <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * (Header.HEIGHT) / 812 }}></View>
+        <KeyboardAvoidingView behavior='padding'  style={styles.mainContainer}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View>
+          <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * (Header.HEIGHT) / 812 }}/>
           <View style={{ flexDirection: "row", justifyContent: 'center' }}>
             <View style={styles.textView}>
               <View style={{}}>
@@ -291,9 +290,9 @@ class Register extends React.Component {
 
           {/* </KeyboardAvoidingView> */}
 
+</View>
 
-
-
+</TouchableWithoutFeedback>
 
 
         </KeyboardAvoidingView>

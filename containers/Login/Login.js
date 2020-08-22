@@ -1,5 +1,5 @@
 import React from 'react';
-import { AsyncStorage } from 'react-native';
+import { AsyncStorage, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { StyleSheet, Text, View, Platform, Animated, Alert, CheckBox, ActivityIndicator, Button, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
 import store from '../../store'
 import { connect } from 'react-redux'
@@ -94,7 +94,7 @@ class Login extends React.Component {
     this.setState({ visible: true })
     try {
 
-      const { type, accessToken, user } = await Google.logInAsync({ androidClientId: "628256299763-6ufb00uro0ehiog4s8ud0hd3hs6jd0ft.apps.googleusercontent.com" });
+      const { type, accessToken, user } = await Google.logInAsync({ androidClientId: "628256299763-6ufb00uro0ehiog4s8ud0hd3hs6jd0ft.apps.googleusercontent.com",iosClientId: "628256299763-a7af1lisn6f4vh8vt6g2uhu4l8sp8k31.apps.googleusercontent.com" });
       if (type === 'success') {
         // Then you can use the Google REST API
         let userInfoResponse = await fetch('https://www.googleapis.com/userinfo/v2/me', {
@@ -289,11 +289,11 @@ class Login extends React.Component {
   render() {
     return (
       <Animated.View style={[styles.container, { height: this.state.animeHeight }]}>
-        <KeyboardAvoidingView style={styles.mainImageView}>
-
+        <KeyboardAvoidingView style={styles.mainImageView} behavior={Platform.OS==='ios' && 'padding'}>
+        <TouchableWithoutFeedback onPress={()=>{Keyboard.dismiss()}}>
+        <ScrollView style={{flex: 1,}} contentContainerStyle={{ justifyContent: 'flex-end', flexGrow: 1}}>
           <Image source={require("../../assets/logo.png")}
             style={[styles.mainImageStyle, { marginBottom: 20 }]} />
-        </KeyboardAvoidingView>
 
         <View style={styles.mainContainer}>
           <View style={{ flex: 1 }}>
@@ -390,7 +390,6 @@ class Login extends React.Component {
                 center
                 value={this.state.checked}
                 onValueChange={() => { this.setState({ checked: !this.state.checked }) }}
-
               />
               <Text style={styles.smallText}>Keep me in</Text>
               <View style={{ backgroundColor: '#ccc', width: Dimensions.get('window').width * 14 / 30 }}></View>
@@ -442,10 +441,10 @@ class Login extends React.Component {
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'center', }}>
 
           </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', marginBottom: 40 }}>
             <TouchableOpacity onPress={() => { this.props.navigation.navigate("Register") }}>
               <Text style={styles.textBelow}>Register</Text>
-            </TouchableOpacity >
+            </TouchableOpacity>
             <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', }} >
               <TouchableOpacity onPress={() => { this.props.navigation.navigate("MainTabNavigator") }}>
                 <Text style={styles.textBelow}>Skip</Text>
@@ -453,6 +452,9 @@ class Login extends React.Component {
             </View>
           </View>
         </View>
+        </ScrollView>
+        </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
 
       </Animated.View>
     );
@@ -476,10 +478,7 @@ const styles = StyleSheet.create({
     // justifyContent: 'center',
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,
-  }, yellowUpperOnly: {
-    marginTop: 150
-  }
-  ,
+  }, 
   yellowContainer: {
     flexDirection: 'row',
     backgroundColor: '#FDFDDD',
@@ -575,10 +574,11 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline'
   },
   mainImageView: {
-
+    flex: 1,
+    justifyContent: 'flex-end',
   },
   mainImageStyle: {
-
+    alignSelf: 'center'
   },
   errorText: {
     color: 'red',
