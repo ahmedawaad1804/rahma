@@ -10,6 +10,8 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import { Avatar, Badge, Icon, withBadge } from 'react-native-elements'
 import { setCartModifications } from '../../actions/product'
 import { Header } from 'react-navigation';
+import io from 'socket.io-client'
+
 /* toast */
 // import Toast from 'react-native-simple-toast';
 /* component */
@@ -32,22 +34,42 @@ class Payment extends React.Component {
 
     componentDidMount() {
         this.setState({ data: this.props.navigation.state.params })
-        console.log(this.props.navigation.state.params);
+        // console.log(this.props.navigation.state.params);
+        // const socket = socketIOClient("http://192.168.1.6:3001");
+        // socket.on("FromAPI", data => {
+        //     console.log(data);
+        //   });
+        this.socket = io("http://192.168.1.6:5001");
+        this.socket.on('some event', (x) => console.log(x))
+        // this.socket.on("chat message", mssg => {
+        //   console.log("mssg recieved in client:", mssg)
+        // })
+    }
+    componentWillUnmount() {
+        console.log("unumount")
+        this.socket.disconnect();
     }
     placeOrder() {
+        // console.log(this.state.data.products);
+        let tempProductsArr = []
+        this.state.data.products.forEach(element => {
+            tempProductsArr.push({ count: element.count, productId: element.item._id })
+        })
         orderService.placeOrder({
-            products: this.state.data.products,
+            products: tempProductsArr,
             totalOrder: this.state.data.totalOrder,
             scheduled: this.state.data.scheduled,
             scheduledDate: this.state.data.scheduledDate,
             address: this.state.data.address,
             paymentType: "cdff",
             paymentInfo: null,
-            promoCode:this.state.data.promoCode
+            promoCode: this.state.data.promoCode
 
 
-        }).then(res=>{
+        }).then(res => {
             console.log(res.data);
+        }).catch(err => {
+            console.log(err.response.data);
         })
     }
 

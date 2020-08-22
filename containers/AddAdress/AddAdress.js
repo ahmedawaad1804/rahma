@@ -31,7 +31,8 @@ class AddAdress extends React.Component {
         route: null,
         street: null,
         appartement: null,
-
+        lat:null,
+        long:null,
         cityList: [{
             value: 'Alex',
         }, {
@@ -86,7 +87,9 @@ class AddAdress extends React.Component {
                     administrative_area,
                     city,
                     country,
-                    current: false
+                    current: false,
+                    lat:this.state.location.coords.latitude,
+                    long:this.state.location.coords.longitude,
                 },
                     
                     
@@ -113,7 +116,9 @@ class AddAdress extends React.Component {
                     administrative_area: this.state.administrative_area,
                     city: this.state.city,
                     country: this.state.country,
-                    current: false
+                    current: false,
+                    lat:null,
+                    long:null
                 })
                 setTimeout(() => {
                     dataService.addAdress(this.props.adressReducer).then().catch(err=>console.log(err))

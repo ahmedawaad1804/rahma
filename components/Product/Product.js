@@ -12,7 +12,7 @@ import FastImage from 'react-native-fast-image'
 
 
 export default Product = (data) => {
-    console.log(data);
+    // console.log(data.src);
     const [heart, setHeart] =data.src.isliked?  useState(require("../../assets/icons/heart-red.png")):useState(require("../../assets/icons/heart-sq.png"))
     // if(data.src.isliked){setHeart(require("../../assets/icons/heart-red.png"))}
     const handleChange = bool => {
@@ -26,11 +26,13 @@ export default Product = (data) => {
             
             <TouchableOpacity onPress={data.handlePress} >
 
-                <Image source={{ uri: data.src.uri }}
+                <Image
+                //  source={{ uri: data.src.uri }}
+                 source={{uri:`http://www.beemallshop.com/img/productImages/${data.src.images[0]}`}}
                     style={styles.productImage} />
 
-                {(data.src.discount && !(data.src.discount === "0")) && <View style={styles.discountBadge}>
-                    <Text style={styles.discountText}>-{data.src.discount}</Text>
+                {( !(data.src.discount === 0)) && <View style={styles.discountBadge}>
+                    <Text style={styles.discountText}>-{data.src.discount} %</Text>
                 </View>}
 
 
@@ -42,9 +44,9 @@ export default Product = (data) => {
                     <View>
                         <Text style={styles.price}>{data.src.price} EGP</Text>
                     </View>
-                    <View style={{ alignItems: "flex-end", flex: 1, justifyContent: 'center' }}>
+                    {( !(data.src.discount === 0)) && <View style={{ alignItems: "flex-end", flex: 1, justifyContent: 'center' }}>
                         <Text style={styles.discount}>{data.src.discountPrice}</Text>
-                    </View>
+                    </View>}
                 </View>
             </View>
             <View style={styles.cartHolder}>
@@ -73,7 +75,7 @@ export default Product = (data) => {
                 </View>
 
             </View>
-            {/* </View> */}
+           
         </View>
 
 
@@ -111,7 +113,8 @@ const styles = StyleSheet.create({
     },
     productOpacity: {
         width: Dimensions.get('window').width * 9 / 20,
-        height: Dimensions.get('window').height * 8 / 20,
+        // height: Dimensions.get('window').height * 8 / 20,
+        // Dimensions.get('window').width * 9 / 20+
         borderRadius: 15,
         margin: Dimensions.get('window').width * 0.4 / 20,
         alignItems: 'center',
@@ -131,7 +134,7 @@ const styles = StyleSheet.create({
     textHolder: {
         backgroundColor: colors.white,
         width: '100%',
-        height: '25%',
+        height: Dimensions.get('window').height *2 / 20,
         paddingLeft: 5,
         paddingRight: 5
     },
@@ -162,7 +165,8 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: 15,
         borderBottomRightRadius: 15,
         flexDirection: 'row',
-        alignItems: 'center'
+        alignItems: 'center',
+        height:Dimensions.get('window').height * 1.5 / 20
     },
     heart: {
         height: '50%',

@@ -43,7 +43,7 @@ const MainTabNavigator = createBottomTabNavigator({
             showIcon: true,
             tabBarIcon: ({ focused, tintColor }) => {
                 const iconSrc = focused ? require('../../assets/tabIcons/home.png') : require('../../assets/tabIcons/home-outline.png')
-                return <Image source={iconSrc} style={{ height: (57/3), width: (61/3) }} />;
+                return <Image source={iconSrc} style={{ height: "65%", resizeMode:'contain'}} />;
             },
         },
     },
@@ -52,7 +52,7 @@ const MainTabNavigator = createBottomTabNavigator({
             showIcon: true,
             tabBarIcon: ({ focused, tintColor }) => {
                 const iconSrc = focused ? require('../../assets/tabIcons/delivery.png') : require('../../assets/tabIcons/delivery-outline.png')
-                return <Image source={iconSrc} style={{ height: 58/2.6, width: 74/2.6 }} />;
+                return <Image source={iconSrc} style={{ height: "65%", resizeMode:'contain' }} />;
             },
         },
     },
@@ -61,7 +61,7 @@ const MainTabNavigator = createBottomTabNavigator({
             showIcon: true,
             tabBarIcon: ({ focused, tintColor }) => {
                 const iconSrc = focused ? require('../../assets/tabIcons/favorite-outline.png') : require('../../assets/tabIcons/favorite-outline.png')
-                return <Image source={iconSrc} style={{ height: 54/3, width: 62/3 }} />;
+                return <Image source={iconSrc} style={{ height: "65%", resizeMode:'contain' }} />;
             },
         },
     },
@@ -70,7 +70,7 @@ const MainTabNavigator = createBottomTabNavigator({
             showIcon: true,
             tabBarIcon: ({ focused, tintColor }) => {
                 const iconSrc = focused ? require('../../assets/tabIcons/profile.png') : require('../../assets/tabIcons/profile-outline.png')
-                return <Image source={iconSrc} style={{ height: 55/2.7, width: 50/2.7 }} />;
+                return <Image source={iconSrc} style={{ height: "65%", resizeMode:'contain'}} />;
             },
         },
     },

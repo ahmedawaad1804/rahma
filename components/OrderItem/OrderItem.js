@@ -49,10 +49,10 @@ export default OrderItem = (data) => {
 
                 </View>
                 <View style={styles.variableText}>
-                    <Text style={{ fontSize: 14, fontFamily: "Cairo-Regular", flex: 1 }}>{data.src.orderNumber}</Text>
+                    <Text style={{ fontSize: 14, fontFamily: "Cairo-Regular", flex: 1 }}>{data.src._id}</Text>
 
                     <Text style={{ fontSize: 14, fontFamily: "Cairo-Regular", flex: 1 }}>{data.src.items}</Text>
-                    <Text style={{ fontSize: 14, fontFamily: "Cairo-Regular", flex: 1 }}><Text style={{ fontSize: 14, fontFamily: "Cairo-Bold" }}>{data.src.price}</Text> EGP</Text>
+                    <Text style={{ fontSize: 14, fontFamily: "Cairo-Regular", flex: 1 }}><Text style={{ fontSize: 14, fontFamily: "Cairo-Bold" }}>{data.src.totalOrder}</Text> EGP</Text>
 
                 </View>
             </View>

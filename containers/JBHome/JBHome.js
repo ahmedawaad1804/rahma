@@ -18,7 +18,7 @@ class JBHome extends React.Component {
 
   }
   async componentDidMount() {
-
+// console.log("did mount");
     let token = await getToken()
     if (token) {
       authService.getUserData().then(res => {
@@ -29,7 +29,7 @@ class JBHome extends React.Component {
         this.props.navigation.navigate("MainStack")
 
       }).catch(err => {
-        console.log(err);
+        console.log(err.response.data);
       })
 
 

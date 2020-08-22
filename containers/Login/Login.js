@@ -17,12 +17,13 @@ import Padv from '../../components/ViewPad/PadV'
 import authService from '../../services/authService'
 /* redux*/
 import { getProducts } from '../../actions/product'
-import {setLogin} from '../../actions/loginAction'
+import { setLogin } from '../../actions/loginAction'
 /* facebook */
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import * as Facebook from 'expo-facebook';
-
-/* google */ 
+/* spinner */
+import Spinner from 'react-native-loading-spinner-overlay';
+/* google */
 import * as Google from 'expo-google-app-auth';
 // ios clientID=628256299763-a7af1lisn6f4vh8vt6g2uhu4l8sp8k31.apps.googleusercontent.com
 class Login extends React.Component {
@@ -48,28 +49,28 @@ class Login extends React.Component {
         const userData = await response.json()
 
         // console.log(token);
-        const responseData=await fetch(`https://graph.facebook.com/me?fields=id,name,first_name,last_name,middle_name,picture,email&access_token=${token}`)
+        const responseData = await fetch(`https://graph.facebook.com/me?fields=id,name,first_name,last_name,middle_name,picture,email&access_token=${token}`)
         // .then(response => response.json())
         // .then(data => console.log(data));
-        const res=await responseData.json()
+        const res = await responseData.json()
         // console.log(res);
-        
+
         // this.setState({ lParams: await response.json().id })
         // this.setState({ fb: token })
 
         authService.checkFaceBookUser(userData.id).then(
           response => {
-            if (response.data.status == "Exist") { 
+            if (response.data.status == "Exist") {
               // console.log(response.data.user);
               setToken(response.data.token)
               this.props.setLogin("f")
               this.props.navigation.navigate("JBHome")
-              
+
             }
             else if (response.data.status == "Not Exist") {
               console.log("Not Exist");
-              
-              this.props.navigation.navigate("VerifyFBSignUp",{userData,token,fbImage:res.picture.data.url})
+
+              this.props.navigation.navigate("VerifyFBSignUp", { userData, token, fbImage: res.picture.data.url })
             }
 
 
@@ -90,29 +91,35 @@ class Login extends React.Component {
     }
   };
   googleLogIn = async () => {
+    this.setState({ visible: true })
     try {
-      
-      const { type, accessToken, user } = await Google.logInAsync({androidClientId:"628256299763-6ufb00uro0ehiog4s8ud0hd3hs6jd0ft.apps.googleusercontent.com"});
+
+      const { type, accessToken, user } = await Google.logInAsync({ androidClientId: "628256299763-6ufb00uro0ehiog4s8ud0hd3hs6jd0ft.apps.googleusercontent.com" });
       if (type === 'success') {
         // Then you can use the Google REST API
         let userInfoResponse = await fetch('https://www.googleapis.com/userinfo/v2/me', {
           headers: { Authorization: `Bearer ${accessToken}` },
         })
         const userData = await userInfoResponse.json()
-        console.log( userData);
+        console.log(userData);
         authService.checkFaceBookUser(userData.id).then(
           response => {
-            if (response.data.status == "Exist") { 
+            if (response.data.status == "Exist") {
               // console.log(response.data.user);
+              console.log("Exist");
+
               setToken(response.data.token)
               this.props.setLogin("f")
               this.props.navigation.navigate("JBHome")
-              
+              this.setState({ visible: false })
+
+
             }
             else if (response.data.status == "Not Exist") {
               console.log("Not Exist");
-              
-              this.props.navigation.navigate("VerifyFBSignUp",{userData,token:null,fbImage:userData.picture})
+              this.setState({ visible: false })
+
+              this.props.navigation.navigate("VerifyFBSignUp", { userData, token: null, fbImage: userData.picture })
             }
 
 
@@ -121,6 +128,8 @@ class Login extends React.Component {
         ).catch(
           err => {
             console.log(err);
+            this.setState({ visible: false })
+
           }
         )
         // .then(res=>res.json())
@@ -132,7 +141,11 @@ class Login extends React.Component {
 
     } catch ({ message }) {
       console.log(message);
+      this.setState({ visible: false })
+
     }
+    this.setState({ visible: false })
+
   };
   static navigationOptions = { header: null }
 
@@ -146,7 +159,8 @@ class Login extends React.Component {
     errorMessage: " ",
     _error: false,
     showPass: true,
-    
+    visible: false,
+
     animeHeight: new Animated.Value(Dimensions.get('window').height * 2)
   }
   componentDidMount() {
@@ -162,7 +176,7 @@ class Login extends React.Component {
     i18n.locale = "cc"
     // console.log(i18n);
 
-  
+
 
 
   }
@@ -217,7 +231,6 @@ class Login extends React.Component {
         this.setState({ _ckeckSignIn: true })
         authService.login(this.state.phonenumber, this.state.password).then(response => {
           //save token and navigatexf
-          console.log(response.data.token);
           setToken(response.data.token)
           this.props.setLogin("n")
           this.props.navigation.navigate("JBHome")
@@ -276,13 +289,16 @@ class Login extends React.Component {
   render() {
     return (
       <Animated.View style={[styles.container, { height: this.state.animeHeight }]}>
-        <KeyboardAvoidingView  style={styles.mainImageView}>
+        <KeyboardAvoidingView style={styles.mainImageView}>
 
           <Image source={require("../../assets/logo.png")}
             style={[styles.mainImageStyle, { marginBottom: 20 }]} />
         </KeyboardAvoidingView>
 
         <View style={styles.mainContainer}>
+          <View style={{ flex: 1 }}>
+            <Spinner visible={this.state.visible} textContent={"Loading..."} textStyle={{ color: colors.white }} />
+          </View>
 
           <Padv height={40} />
 
@@ -386,44 +402,44 @@ class Login extends React.Component {
             </View>
 
           </View>
-          <View style={{flexDirection:'row'}}>
-          <TouchableOpacity
-            style={{
-              backgroundColor: "#3f5c9a",
-              alignItems: "center",
-              justifyContent: "center",
-              width: Dimensions.get('window').width * 160 / 375,
-              height: Dimensions.get('window').height * 46 / 812,
-              borderColor: "#3f5c9a",
-              borderWidth: 1,
-              borderRadius: 50,
-              marginHorizontal:5
-            }}
-            onPress={this.FBlogIn}
-          >
+          <View style={{ flexDirection: 'row' }}>
+            <TouchableOpacity
+              style={{
+                backgroundColor: "#3f5c9a",
+                alignItems: "center",
+                justifyContent: "center",
+                width: Dimensions.get('window').width * 160 / 375,
+                height: Dimensions.get('window').height * 46 / 812,
+                borderColor: "#3f5c9a",
+                borderWidth: 1,
+                borderRadius: 50,
+                marginHorizontal: 5
+              }}
+              onPress={this.FBlogIn}
+            >
 
-            <FontAwesome name="facebook-f" size={20} color="white" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{
-              backgroundColor: "#de5246",
-              alignItems: "center",
-              justifyContent: "center",
-              width: Dimensions.get('window').width * 160 / 375,
-              height: Dimensions.get('window').height * 46 / 812,
-              borderColor: "#de5246",
-              borderWidth: 1,
-              borderRadius: 50,
-              marginHorizontal:5
+              <FontAwesome name="facebook-f" size={20} color="white" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{
+                backgroundColor: "#de5246",
+                alignItems: "center",
+                justifyContent: "center",
+                width: Dimensions.get('window').width * 160 / 375,
+                height: Dimensions.get('window').height * 46 / 812,
+                borderColor: "#de5246",
+                borderWidth: 1,
+                borderRadius: 50,
+                marginHorizontal: 5
 
-            }}
-            onPress={this.googleLogIn}
-          >
+              }}
+              onPress={this.googleLogIn}
+            >
 
-            <FontAwesome name="google" size={20} color="white" />
-          </TouchableOpacity>
+              <FontAwesome name="google" size={20} color="white" />
+            </TouchableOpacity>
           </View>
-          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'flex-end' ,justifyContent: 'center', }}>
+          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'center', }}>
 
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', }}>

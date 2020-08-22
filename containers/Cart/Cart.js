@@ -179,7 +179,7 @@ class Cart extends React.Component {
                                 <View style={styles.orderOpacity}>
                                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                                         <Image
-                                            source={{ uri: item.item.uri }}
+                                            source={{uri:`http://www.beemallshop.com/img/productImages/${item.item.images[0]}`}}
                                             style={styles.imageStyle}
                                         />
                                     </View>
@@ -258,7 +258,7 @@ class Cart extends React.Component {
                             </View>
                             <View style={{ flex: 2, justifyContent: 'center', alignItems: 'center', }}>
                                 <Text style={{ fontSize: 14, fontFamily: "Cairo-Regular" }}>Total Cost</Text>
-                                <Text style={{ fontSize: 14, fontFamily: "Cairo-Regular" }}>EGP {this.state.total}</Text>
+                                <Text style={{ fontSize: 14, fontFamily: "Cairo-Regular" }}>EGP {this.state.cost}</Text>
                             </View>
                         </View>
                         <View style={{ flex: 2, flexDirection: 'row' }}>

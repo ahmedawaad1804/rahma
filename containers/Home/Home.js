@@ -2,6 +2,8 @@ import React from 'react';
 import { StyleSheet, Text, View, RefreshControl, FlatList, ActivityIndicator, Button, Animated, SectionList, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
 import store from '../../store'
 import { connect } from 'react-redux'
+/* lodash */ 
+import { _ } from "lodash";
 /* colors */
 import colors from '../../colors'
 /* padding */
@@ -44,23 +46,14 @@ class Home extends React.Component {
     borderRadius: 40,
     refreshing: false,
     data: [
-      { key: 'Supermarket' },
-      { key: 'Pastry' },
-      { key: 'Mini Market' },
-      { key: 'Beauty' },
-      { key: 'f' },
-      { key: 'a' },
-      { key: '4' },
-      { key: 'q' },
-      { key: '5' },
-      { key: 'w' },
-      { key: '88' },
+
 
 
     ],
     categoryFalg: false,
     bestSeller: [],
     bestSellerProducts: [],
+    LatestOffersProducts: [],
     isDataLoaded: false,
     test: null,
     count: 0,
@@ -74,7 +67,7 @@ class Home extends React.Component {
       { key: 'Mini Market' },
       { key: 'Beauty' },
       { key: 'f' },
-   
+
 
 
     ],
@@ -87,30 +80,58 @@ class Home extends React.Component {
 
     store.subscribe(() => {
       this.setState({ count: this.props.cartReducer.length })
-// console.log("home");
 
-      // Some DOM api calls.
     });
 
-    this.setState({ bestSellerProducts: this.props.productsReducer }, (() => { this.setState({ isDataLoaded: true }) }))
-
+    // this.setState({ bestSellerProducts: this.props.bestsellerReducer }, (() => { this.setState({ isDataLoaded: true }) }))
+    ////
+    dataService.getBestSeller().then(res => {
+      this.setState({ bestSellerProducts: res.data.result })
+      console.log( res.data.result);
+    }).catch(err => {
+      console.log(err.response.data);
+    })
+    dataService.getLatestOffers().then(res => {
+      let temp = []
+      res.data.offers.forEach(element => {
+        temp.push(element.productId)
+      });
+      this.setState({ LatestOffersProducts: temp })
+    }).catch(err => {
+      console.log(err.response.data);
+    })
+    /////
+    this.setState({ isDataLoaded: true })
     console.log(this.props.categoryReducer);
     let temp = []
     this.props.categoryReducer.map(category => temp.push(category.mainCategory))
     this.setState({ data: temp })
     // console.log();
-    
+
   }
 
 
-  onRefresh = () => {
+ onRefresh = async () => {
     console.log("onRefresh");
     this.setState({ refreshing: true })
-    this.props.refreshtProducts()
-    this.props.getCategory()
-    
+   await  dataService.getBestSeller().then(res => {
+      this.setState({ bestSellerProducts: res.data.result })
+      console.log(res.data.result);
+    }).catch(err => {
+      console.log(err.response.data);
+    })
+    await dataService.getLatestOffers().then(res => {
+      let temp = []
+      res.data.offers.forEach(element => {
+        temp.push(element.productId)
+      });
+      this.setState({ LatestOffersProducts: temp })
+    }).catch(err => {
+      console.log(err.response.data);
+    })
+    console.log("onRefresh finished");
     this.setState({ refreshing: false })
-    this.setState({ bestSellerProducts: this.props.bestsellerReducer })
+   
 
   }
   //   getEvent(event) {
@@ -139,15 +160,15 @@ class Home extends React.Component {
   handleLike(bool, item) {
 
     if (bool) {
-        likeService.setLike(item._id).then().catch(err => { console.log(err); })
+      likeService.setLike(item._id).then().catch(err => { console.log(err); })
     }
     else {
-        likeService.setDislike(item._id).then().catch(err => { console.log(err); })
+      likeService.setDislike(item._id).then().catch(err => { console.log(err); })
 
     }
 
 
-}
+  }
   _handleSearchButton() {
     if (this.state.searchData.length == 0) {
       // Toast.show("No Search input");
@@ -158,8 +179,18 @@ class Home extends React.Component {
 
 
   }
+  debounceFunction(func, delay) {
+    // Cancels the setTimeout method execution
+    clearTimeout(this.timerId)
+  
+    // Executes the func after delay time.
+    this.timerId  =  setTimeout(func, delay)
+  }
+  onChangeText(text) {
+    this.debounceFunction(()=>this._handleSearch(text),1300)
+    // this._handleSearch(text)   //instant search
+  }
   _handleSearch = (text) => {
-
     let temp = []
 
     let i = 0;
@@ -167,9 +198,10 @@ class Home extends React.Component {
       this.setState({ _isSearch: true })
       dataService.search(text).then(response => {
         this.setState({ searchData: response.data }, () => {
-          
+
 
         })
+        // console.log(response.data);
       }
       ).catch(err => {
         console.log(err);
@@ -300,8 +332,8 @@ class Home extends React.Component {
 
               secureTextEntry={this.state.showPass}
               autoCapitalize='none'
-              onChangeText={(text) => this._handleSearch(text)}
-              // onBlur={() => {this.setState({ _isSearch: false })}}
+              onChangeText={(text) => this.onChangeText(text)}
+            // onBlur={() => {this.setState({ _isSearch: false })}}
             />
           </View>
           <View style={styles.searchView}>
@@ -331,31 +363,33 @@ class Home extends React.Component {
                   // ItemSeparatorComponent = { (<View><Text>asdf</Text></View>) }
                   showsVerticalScrollIndicator={false}
                   contentContainerStyle={styles.grid}
-                  
+
                   sections={[{ title: "BEST SELLER", data: this.state.bestSellerProducts },
-                  { title: "LATEST OFFER", data: this.state.bestSellerProducts }]}
+                  { title: "LATEST OFFER", data: this.state.LatestOffersProducts }]}
                   renderSectionHeader={({ section: { title } }) => (
                     <View style={styles.textView}>
                       <Text style={styles.titleText}>{title}</Text>
                     </View>
                   )}
                   initialNumToRender={5}
-                  renderItem={({ item, index }) =>
-
+                  renderItem={({ item, index, section }) =>
                     index % 2 == 0 &&
                     <View style={{ flexDirection: 'row' }}>
                       <Product
-                        handlePress={() => this.handlePress(this.state.bestSellerProducts[index])}
-                        handleLike={(e) => { this.handleLike(e, this.state.bestSellerProducts[index]) }}
-                        handleCartAddOne={() => this.handleCartAddOne(this.state.bestSellerProducts[index])}
-                        src={this.state.bestSellerProducts[index]}
+                        handlePress={() => this.handlePress(section.title=="BEST SELLER"?this.state.bestSellerProducts[index]:this.state.LatestOffersProducts[index])}
+                        handleLike={(e) => { this.handleLike(e, section.title=="BEST SELLER"?this.state.bestSellerProducts[index]:this.state.LatestOffersProducts[index]) }}
+                        handleCartAddOne={() => this.handleCartAddOne(section.title=="BEST SELLER"?this.state.bestSellerProducts[index]:this.state.LatestOffersProducts[index])}
+                        src={section.title=="BEST SELLER"?this.state.bestSellerProducts[index]:this.state.LatestOffersProducts[index]}
+                      // section.title=="BEST SELLER"?this.state.bestSellerProducts[index]:this.state.LatestOffersProducts[index]
                       />
-                      {this.state.bestSellerProducts[index + 1] &&
+                      {
+                        // console.log(section.title=="BEST SELLER"?"bs":"lo"),
+                        (section.title=="BEST SELLER"?this.state.bestSellerProducts[index+1]:this.state.LatestOffersProducts[index+1]) &&
                         <Product
-                          handlePress={() => this.handlePress(this.state.bestSellerProducts[index + 1])}
-                          handleLike={(e) => { this.handleLike(e, this.state.bestSellerProducts[index + 1]) }}
-                          handleCartAddOne={() => this.handleCartAddOne(this.state.bestSellerProducts[index + 1])}
-                          src={this.state.bestSellerProducts[index + 1]}
+                          handlePress={() => this.handlePress(section.title=="BEST SELLER"?this.state.bestSellerProducts[index+1]:this.state.LatestOffersProducts[index+1])}
+                          handleLike={(e) => { this.handleLike(e, section.title=="BEST SELLER"?this.state.bestSellerProducts[index+1]:this.state.LatestOffersProducts[index+1]) }}
+                          handleCartAddOne={() => this.handleCartAddOne(section.title=="BEST SELLER"?this.state.bestSellerProducts[index+1]:this.state.LatestOffersProducts[index+1])}
+                          src={section.title=="BEST SELLER"?this.state.bestSellerProducts[index+1]:this.state.LatestOffersProducts[index+1]}
                         />}
                     </View>
 
@@ -484,7 +518,7 @@ const styles = StyleSheet.create({
     marginLeft: Dimensions.get('window').width * 15 / 375,
     fontFamily: 'Cairo-Bold',
     fontSize: 20,
-    backgroundColor:colors.white
+    backgroundColor: colors.white
   },
   textView: {
     alignItems: 'flex-start',

@@ -9,7 +9,12 @@ export default dataService = {
     getBestSeller: () => {
 
         return axiosInstance
-            .get('/offers/bestSeller');
+            .get('/product/getBestSeller');
+    },
+    getLatestOffers: () => {
+
+        return axiosInstance
+            .get('/offers/offers');
     },
     getCategory: () => {
 

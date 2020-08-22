@@ -15,6 +15,7 @@ state={
 }
 componentDidMount(){
   // this.props
+  console.log(this.props.src);
   this.setState({source:this.props.src.icon})
 }
 // shouldComponentUpdate(){
@@ -31,7 +32,7 @@ render(){
         <Image style={styles.imageThumbnail} source={{uri:`http://www.beemallshop.com/img/MainCatIcons/${this.state.source}`}}
         onError={()=>{this.setState({source:"Beauty"})}}/>
         <Text style={styles.smallText}>{this.props.src.nameEN}</Text>
-        <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * 12 / 812 }}></View>
+        <View style={{ backgroundColor: '#ccc', height:"5%" }}></View>
       </TouchableOpacity>
     </View>
 

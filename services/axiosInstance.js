@@ -18,7 +18,10 @@ axiosInstance.interceptors.request.use(async config => {
         return config;
     }
     config.headers["api-key"]="testtest"
+    console.log(config.headers["api-key"]);
     return config;
 }, error => {
+    console.log(error);
+    console.log("yoyo");
     return Promise.reject(error);
 });

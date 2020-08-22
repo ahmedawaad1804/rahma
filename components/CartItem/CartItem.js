@@ -12,14 +12,14 @@ import FastImage from 'react-native-fast-image'
 
 
 export default CartItem = (data) => {
-
+// console.log(data);
 
     return (
 
         <View style={styles.orderOpacity}>
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                 <Image
-                    source={{uri:data.src.item.uri}}
+                  source={{uri:`http://www.beemallshop.com/img/productImages/${data.src.images[0]}`}}
                     style={styles.imageStyle}
                 />
             </View>

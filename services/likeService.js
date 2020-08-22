@@ -11,6 +11,11 @@ export default likeService = {
         return axiosInstance
             .post('/like/removeLike',{productId});
     },
+    getLikes: () => {
+
+        return axiosInstance
+            .get('/like/getLikes');
+    },
 
 
 

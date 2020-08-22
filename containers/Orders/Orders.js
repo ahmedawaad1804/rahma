@@ -12,6 +12,8 @@ import { Header } from 'react-navigation';
 // import Toast from 'react-native-simple-toast';
 /* component */
 import OrderItem from '../../components/OrderItem/OrderItem'
+import dataService from '../../services/dataService';
+import orderService from '../../services/orderService';
 class MainCategory extends React.Component {
     state = {
         orderTypes: [
@@ -40,7 +42,7 @@ class MainCategory extends React.Component {
         _isDataLoaded: false,
         refreshing: false,
         _isLogIn: false,
-        user:{},
+        user: {},
 
 
     };
@@ -49,15 +51,19 @@ class MainCategory extends React.Component {
         store.subscribe(() => {
             this.setState({ counter: this.props.cartReducer.length })
             // console.log("subscribed");
-
-
         });
-        this.setState({ loop: this.state.orders })
+        orderService.getOrders().then(res => {
+            console.log(res.data);
+            this.setState({ loop: res.data })
+        }).catch(err => { console.log(err); })
+
+
+        // this.setState({ loop: this.state.orders })
         this.setState({ _isDataLoaded: true })
         /// test
         // console.log(this.props.loginReducer);
-        if(this.props.loginReducer){
-            this.setState({_isLogIn:true})
+        if (this.props.loginReducer) {
+            this.setState({ _isLogIn: true })
         }
         if (this.props.userReducer) {
             this.setState({ user: this.props.userReducer })
@@ -68,14 +74,22 @@ class MainCategory extends React.Component {
     _handlePress = (item) => {
         this.setState({ _isPressed: item })
         console.log(item);
-        item == 0 ? this.setState({ loop: this.state.orders }) : this.setState({ loop: this.state.ordersHistory })
+        // item == 0 ? this.setState({ loop: this.state.orders }) : this.setState({ loop: this.state.ordersHistory })
 
     }
     onRefresh = () => {
         console.log("onRefresh");
         this.setState({ refreshing: true })
-        // this.props.refreshOrders()
-        this.setState({ refreshing: false })
+        orderService.getOrders().then(res => {
+            console.log(res.data);
+            this.setState({ loop: res.data })
+            this.setState({ refreshing: false })
+
+        }).catch(err => {
+            console.log(err);
+            this.setState({ refreshing: false })
+
+        })
 
 
     }
@@ -120,10 +134,6 @@ class MainCategory extends React.Component {
                 </View>
 
                 {this.state._isLogIn && <View style={styles.mainContainer}>
-
-
-
-
 
 
                     {this.state._isDataLoaded && <View style={{ justifyContent: 'center', height: Dimensions.get('window').height * 46 / 812, alignItems: 'center', marginBottom: 15 }}>
@@ -193,7 +203,7 @@ class MainCategory extends React.Component {
                 }
                 {
                     !this.state._isLogIn && <View style={[styles.mainContainer, { justifyContent: 'center' }]}>
-                        <View style={{alignItems:'flex-start',width:"100%"}}>
+                        <View style={{ alignItems: 'flex-start', width: "100%" }}>
                             <Text style={styles.headerText}>You arn't logged in</Text>
                             <Text style={styles.instructionText}>Please log in</Text>
                         </View>
@@ -290,7 +300,7 @@ const mapStateToProps = state => ({
     loginReducer: state.loginReducer,
     cartReducer: state.cartReducer,
     productsReducer: state.productsReducer,
-    userReducer:state.userReducer,
+    userReducer: state.userReducer,
 
 })
 const mapDispatchToProps = {

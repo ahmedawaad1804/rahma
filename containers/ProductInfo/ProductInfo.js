@@ -39,6 +39,7 @@ class ProductInfo extends React.Component {
 
     static navigationOptions = { header: null }
     componentDidMount() {
+        console.log(this.props.navigation.state.params.item.isliked);
         this.unsubscribe = store.subscribe(() => {
             this.setState({ counter: this.props.cartReducer.length })
 
@@ -56,14 +57,14 @@ class ProductInfo extends React.Component {
         }
     }
     submitItem = () => {
-        
+
         if (this.state.count > 0) {
             // Toast.show(`${this.props.navigation.state.params.item.productNameEN} added to cart`);
             this.props.setCart({
-                item:this.props.navigation.state.params.item, count: this.state.count,
+                item: this.props.navigation.state.params.item, count: this.state.count,
             })
         }
-        else{
+        else {
             // Toast.show("Add Quantity");
         }
 
@@ -113,16 +114,24 @@ class ProductInfo extends React.Component {
                 <View style={styles.mainContainer}>
                     {/* <View style={[styles.detailsContainer, { backgroundColor: 'green' }]}> */}
 
-                    {(this.props.navigation.state.params.item.discount && !(this.props.navigation.state.params.item.discount === "0")) && <View style={styles.discountBadge}>
+                    {(!(this.props.navigation.state.params.item.discount === 0)) && <View style={styles.discountBadge}>
                         <Text style={styles.discountText}>-{this.props.navigation.state.params.item.discount}</Text>
                     </View>}
+                    {/* {( !(data.src.discount === 0)) && <View style={styles.discountBadge}>
+                    <Text style={styles.discountText}>-{data.src.discount}</Text>
+                </View>} */}
 
                     <View style={styles.likeBadge}>
-                        <Image source={require("../../assets/icons/heart.png")}
-                            style={styles.heartImage} />
-                        <Text>3,547</Text>
+                        {this.props.navigation.state.params.item.isliked ?
+                        <Image source={require("../../assets/icons/heart-red.png")}
+                            style={styles.heartImage} />:
+                            <Image source={require("../../assets/icons/heart.png")}
+                            style={styles.heartImage} />}
+                        <Text>{this.props.navigation.state.params.item.likes}</Text>
                     </View>
-                    <Image source={{ uri: this.props.navigation.state.params.item.uri }}
+                    <Image
+                        source={{ uri: this.props.navigation.state.params.item.uri }}
+                        source={{ uri: `http://www.beemallshop.com/img/productImages/${this.props.navigation.state.params.item.images[0]}` }}
                         style={styles.productImage} />
                     <TouchableOpacity style={styles.rateButton}>
                         <Text style={styles.rateFont}>Rate Product</Text>
@@ -269,7 +278,8 @@ const styles = StyleSheet.create({
         height: Dimensions.get('window').height * 245 / 812,
         // height: '30.1%',
         resizeMode: "contain",
-        marginTop: 20
+        marginTop: 20,
+        // backgroundColor:'red'
     },
     rateButton: {
         width: Dimensions.get('window').width * 117 / 375,

@@ -12,17 +12,15 @@ import { Header } from 'react-navigation';
 // import Toast from 'react-native-simple-toast';
 /* component */
 import Product from '../../components/Product/Product'
+/* services */
+import dataService from '../../services/dataService'
+import likeService from '../../services/likeService'
+
 class Favorites extends React.Component {
     state = {
-        category: [
-            "All",
-            "Supermarket",
-            "pastry",
-            "Mini Market"
-
-
-        ],
+        category: [],
         itemData: [],
+        data: [],
         counter: this.props.cartReducer.length,
         _isPressed: "All",
         _isDataLoaded: false,
@@ -40,7 +38,22 @@ class Favorites extends React.Component {
 
 
         });
-        this.setState({ itemData: this.props.productsReducer })
+        likeService.getLikes().then(res => {
+            console.log(res.data.likes);
+            this.setState({ itemData: res.data.likes })
+            this.setState({ data: res.data.likes })
+            let category = ["All"]
+            res.data.likes.forEach(element => {
+                if (category.indexOf(element.subCatygory) === -1) {
+                    category.push(element.subCatygory);
+                    // console.log(this.items);
+                }
+            });
+            this.setState({ category })
+            console.log(category);
+        }).catch(err => { console.log(err); })
+        // this.setState({ itemData: this.props.bestsellerReducer })
+
         this.setState({ _isDataLoaded: true })
         if (this.props.loginReducer) {
             this.setState({ _isLogIn: true })
@@ -54,14 +67,39 @@ class Favorites extends React.Component {
 
     _handlePress = (item) => {
         this.setState({ _isPressed: item })
-        item == 0 ? this.setState({ loop: this.state.orders }) : this.setState({ loop: this.state.ordersHistory })
+        console.log(item);
+        if(item=="All")
+        {
+            this.setState({itemData:this.state.data})
+        }
+        else{
+            
+        }
+        // item == 0 ? this.setState({ loop: this.state.orders }) : this.setState({ loop: this.state.ordersHistory })
 
     }
     onRefresh = () => {
         console.log("onRefresh");
         this.setState({ refreshing: true })
         // this.props.refreshOrders()
+        likeService.getLikes().then(res => {
+            console.log(res.data.likes);
+            this.setState({ itemData: res.data.likes })
+            this.setState({ data: res.data.likes })
+            let category = ["All"]
+            res.data.likes.forEach(element => {
+                if (category.indexOf(element.subCatygory) === -1) {
+                    category.push(element.subCatygory);
+                    // console.log(this.items);
+                }
+            });
+            this.setState({ category })
+            console.log(category);
         this.setState({ refreshing: false })
+
+        }).catch(err => { console.log(err); 
+            this.setState({ refreshing: false })
+        })
 
 
     }
@@ -136,7 +174,7 @@ class Favorites extends React.Component {
                                 </ScrollView>
                             </View>
 
-                            <View>
+                            <View style={{ marginBottom: Dimensions.get('window').height * 120 / 812 }}>
                                 <FlatList
                                     // disableVirtualization={false}
                                     showsVerticalScrollIndicator={false}
@@ -147,11 +185,11 @@ class Favorites extends React.Component {
                                     keyExtractor={(item) => item.toString()}
                                     // initialNumToRender={50}
                                     // ItemSeparatorComponent = { (<View><Text>asdf</Text></View>) }
-                                    contentContainerStyle={{ paddingBottom: 100 }}
+                                    contentContainerStyle={{ paddingBottom: 0 }}
                                     data={this.state.itemData}
 
                                     renderItem={({ item }) => (
-
+                                        item.subCatygory==this.state._isPressed ||this.state._isPressed=="All"?
                                         // <Text>sd</Text>
                                         <Product
                                             handlePress={() => this.handlePress(item)}
@@ -160,6 +198,7 @@ class Favorites extends React.Component {
 
 
                                         />
+                                        :null
                                     )}
                                     refreshControl={
                                         <RefreshControl
@@ -280,6 +319,7 @@ const styles = StyleSheet.create({
 const mapStateToProps = state => ({
     cartReducer: state.cartReducer,
     productsReducer: state.productsReducer,
+    bestsellerReducer: state.bestsellerReducer,
     userReducer: state.userReducer,
     loginReducer: state.loginReducer,
 })

@@ -41,9 +41,9 @@ class SubCategory extends React.Component {
 
     }
     handleLike(bool, item) {
-
+console.log(item._id);
         if (bool) {
-            likeService.setLike(item._id).then().catch(err => { console.log(err); })
+            likeService.setLike(item._id).then().catch(err => { console.log(err.response); })
         }
         else {
             likeService.setDislike(item._id).then().catch(err => { console.log(err); })
