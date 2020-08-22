@@ -69,19 +69,20 @@ export default class App extends React.Component {
             <Navigation />
           </Provider>
        
-       </SafeAreaView >
+       </SafeAreaView>
     );
   }
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    // height: Dimensions.get('window').height+Expo.Constants.statusBarHeight,
-    width:Dimensions.get('window').width,
+    // flex: 1,
+    height: Dimensions.get('window').height+Expo.Constants.statusBarHeight,
+    width:'100%',
     // backgroundColor: '#ccc',
     // alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: colors.primary
     // marginTop: Expo.Constants.statusBarHeight,
     // marginBottom: Expo.Constants.statusBarHeight,
   },
