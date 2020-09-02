@@ -1,3 +1,20 @@
 {
-    "welcome": "Welcome to translation tutorial"
+    "login": "Login",
+    "rgister":"Register",
+    "skip":"Skip",
+    "phone":"Phone Number",
+    "pass":"Password",
+    "keepmein":"Keep me in",
+    "forget":"Forget Password",
+    "discover":"Discover",
+    "bs":"BEST SELLER",
+    "lf":"LATEST OFFER",
+    "whatareulooking":"What are you looking for ?",
+    "home":"Home",
+    "orders":"Orders",
+    "favorites":"Favorites",
+    "profile":"Profile"
+
+
+
 }

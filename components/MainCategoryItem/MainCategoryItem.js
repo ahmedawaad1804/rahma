@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, CheckBox, TouchableHighlight, Button, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, CheckBox, TouchableHighlight,I18nManager, Button, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
 import store from '../../store'
 import { connect } from 'react-redux'
 /* colors */
@@ -15,7 +15,7 @@ state={
 }
 componentDidMount(){
   // this.props
-  console.log(this.props.src);
+  console.log(this.props.src.nameAR);
   this.setState({source:this.props.src.icon})
 }
 // shouldComponentUpdate(){
@@ -31,7 +31,7 @@ render(){
       <TouchableOpacity style={styles.gridCell} onPress={()=>{this.props.click()}}>
         <Image style={styles.imageThumbnail} source={{uri:`http://www.beemallshop.com/img/MainCatIcons/${this.state.source}`}}
         onError={()=>{this.setState({source:"Beauty"})}}/>
-        <Text style={styles.smallText}>{this.props.src.nameEN}</Text>
+        <Text style={styles.smallText}>{I18nManager.isRTL?this.props.src.nameAR:this.props.src.nameEN}</Text>
         <View style={{ backgroundColor: '#ccc', height:"5%" }}></View>
       </TouchableOpacity>
     </View>

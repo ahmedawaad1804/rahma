@@ -47,6 +47,10 @@ export default dataService = {
         return axiosInstance
             .post('/client/addAddress', { cart });
     },
+    getBrief: () => {
+        return axiosInstance
+            .get('/general/info');
+    },
 
 
 

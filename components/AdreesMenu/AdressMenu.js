@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, CheckBox, TouchableHighlight, Button, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, CheckBox, TouchableHighlight, Button, Input, ScrollView,I18nManager, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
 import store from '../../store'
 import { connect } from 'react-redux'
 /* colors */
@@ -56,13 +56,13 @@ export default class MainCategoryItem extends React.Component {
                         <MenuItem disabled={this.props.item.current} onPress={()=>{this.hideMenu(),this.makeCurrent()}}> <Image source={require("../../assets/icons/marker2.png")}
                             style={styles.smallIcon} 
                             />
-                            <Text>  Make Current</Text></MenuItem>
+                            <Text>{I18nManager.isRTL ? "الحالي" : "Make Current"}  </Text></MenuItem>
                         <MenuItem onPress={()=>{this.hideMenu(),this.deleteAdress()}}
                         >
                             <Image source={require("../../assets/icons/pin.png")}
 
                                 style={styles.smallIcon} />
-                            <Text>  Delete</Text>
+                            <Text>{I18nManager.isRTL ? "مسح" : "Delete"}  </Text>
 
                         </MenuItem>
 

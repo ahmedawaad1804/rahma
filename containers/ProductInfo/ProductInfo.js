@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, RefreshControl, FlatList, ActivityIndicator, Button, Animated, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, RefreshControl, I18nManager, FlatList, ActivityIndicator, Button, Animated, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
 import store from '../../store'
 import { connect } from 'react-redux'
 /* colors */
@@ -93,7 +93,7 @@ class ProductInfo extends React.Component {
                         <Text style={{
                             fontFamily: 'Cairo-Regular',
                             fontSize: 20,
-                        }}>Product Info</Text>
+                        }}>{I18nManager.isRTL ? "المنتج" : "Product Info"}</Text>
                     </View>
                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                         <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingLeft: 30, width: "70%" }}>
@@ -123,10 +123,10 @@ class ProductInfo extends React.Component {
 
                     <View style={styles.likeBadge}>
                         {this.props.navigation.state.params.item.isliked ?
-                        <Image source={require("../../assets/icons/heart-red.png")}
-                            style={styles.heartImage} />:
+                            <Image source={require("../../assets/icons/heart-red.png")}
+                                style={styles.heartImage} /> :
                             <Image source={require("../../assets/icons/heart.png")}
-                            style={styles.heartImage} />}
+                                style={styles.heartImage} />}
                         <Text>{this.props.navigation.state.params.item.likes}</Text>
                     </View>
                     <Image
@@ -134,13 +134,13 @@ class ProductInfo extends React.Component {
                         source={{ uri: `http://www.beemallshop.com/img/productImages/${this.props.navigation.state.params.item.images[0]}` }}
                         style={styles.productImage} />
                     <TouchableOpacity style={styles.rateButton}>
-                        <Text style={styles.rateFont}>Rate Product</Text>
+                        <Text style={styles.rateFont}>{I18nManager.isRTL ? "تقييم المنتج" : "Rate Product"}</Text>
                     </TouchableOpacity>
                     <View style={styles.productQntyContainer}>
                         <View style={styles.productTitle}>
-                            <Text style={{ fontFamily: "Cairo-Regular", fontSize: 20 }}>{this.props.navigation.state.params.item.productNameEN}</Text>
+                            <Text style={{ fontFamily: "Cairo-Regular", fontSize: 20 }}>{I18nManager.isRTL ?this.props.navigation.state.params.item.productNameAR:this.props.navigation.state.params.item.productNameEN}</Text>
                             <View style={styles.priceContainer}>
-                                <Text style={{ fontFamily: "Cairo-Bold", fontSize: 18, color: colors.gold }}>EGP {this.props.navigation.state.params.item.price}</Text>
+                                <Text style={{ fontFamily: "Cairo-Bold", fontSize: 18, color: colors.gold }}>{I18nManager.isRTL ? "ج.م" : "EGP"} {this.props.navigation.state.params.item.price}</Text>
                                 <View style={styles.dicountContainer}>
                                     <Text style={styles.discount}>{this.props.navigation.state.params.item.discountPrice}</Text>
                                 </View>
@@ -148,7 +148,7 @@ class ProductInfo extends React.Component {
                         </View>
                         <View style={styles.productQnty}>
 
-                            <Text style={{ fontFamily: "Cairo-Regular", fontSize: 14 }}>Quantity</Text>
+                            <Text style={{ fontFamily: "Cairo-Regular", fontSize: 14 }}>{I18nManager.isRTL ? "الكمية" : "Quantity"}</Text>
                             <View style={{ flexDirection: 'row', width: "100%", flex: 1, justifyContent: 'center' }}>
                                 <View style={styles.increamentContainer}>
                                     <TouchableOpacity style={styles.plusOrMinus} onPress={this.decrease}>
@@ -170,20 +170,20 @@ class ProductInfo extends React.Component {
                     </View>
                     <View style={styles.productDetails}>
                         <View style={styles.productDetailsTitle}>
-                            <Text style={{ fontFamily: "Cairo-Bold", fontSize: 16, }}>Product Details</Text>
+                            <Text style={{ fontFamily: "Cairo-Bold", fontSize: 16, }}>{I18nManager.isRTL ? "تفاصيل المنتج" : "Product Details"}</Text>
                         </View>
                         <View style={styles.flatListContainer}>
                             <FlatList
                                 showsVerticalScrollIndicator={false}
                                 // contentContainerStyle={styles.grid}
-                                data={this.props.navigation.state.params.item.detailEN}
+                                data={I18nManager.isRTL ? this.props.navigation.state.params.item.detailAR : this.props.navigation.state.params.item.detailEN}
                                 renderItem={({ item }) => (
 
                                     <Text style={{ flex: 1, padding: 5, fontFamily: 'Cairo-SemiBold' }}>{item}</Text>
                                 )}
                                 style={{ width: '100%' }}
                                 horizontal={false}
-                                numColumns={2}
+                                numColumns={1}
                             ></FlatList>
                         </View>
 
@@ -191,7 +191,7 @@ class ProductInfo extends React.Component {
                     <TouchableOpacity style={styles.addToCart}
                         onPress={this.submitItem}
                     >
-                        <Text style={{ fontFamily: "Cairo-Bold", fontSize: 16, }}>Add To Cart</Text>
+                        <Text style={{ fontFamily: "Cairo-Bold", fontSize: 16, }}>  {I18nManager.isRTL ? "إضافة الي السلة" : "Add To Cart"}  </Text>
                         <Image source={require("../../assets/icons/cartIn.png")}
                             style={styles.cartIcon} />
                     </TouchableOpacity>

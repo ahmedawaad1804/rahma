@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, RefreshControl, FlatList, ActivityIndicator, Button, Animated, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, RefreshControl, FlatList, ActivityIndicator, Button, Animated, Input, I18nManager, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
 import store from '../../store'
 import { connect } from 'react-redux'
 /* colors */
@@ -17,7 +17,7 @@ import dataService from '../../services/dataService'
 import likeService from '../../services/likeService'
 /* utility */
 import { likedHandle } from '../../utility/likedHandle'
-/* action */ 
+/* action */
 import { setUser } from '../../actions/userAction'
 
 class SubCategory extends React.Component {
@@ -27,6 +27,7 @@ class SubCategory extends React.Component {
         category: [],
         allData: [],
         counter: this.props.cartReducer.length,
+        _isLoaded: false
 
     };
 
@@ -41,7 +42,7 @@ class SubCategory extends React.Component {
 
     }
     handleLike(bool, item) {
-console.log(item._id);
+        console.log(item._id);
         if (bool) {
             likeService.setLike(item._id).then().catch(err => { console.log(err.response); })
         }
@@ -67,25 +68,27 @@ console.log(item._id);
 
             this.setState({ allData: tempArr }, () => {
 
-                this.setState({ data: this.state.allData })
+                this.setState({ data: this.state.allData, _isLoaded: true })
 
             }
             )
         }
         ).catch(err => {
             console.log(err);
+            this.setState({ _isLoaded: true })
         })
     }
-  async  componentDidMount() {
-        if(this.props.userReducer){
-       await  authService.getUserData().then(res => {
-            this.setState({ username:res.data.user.username })
-      
-              this.props.setUser(res.data.user)
-      
-            }).catch(err=>{
-              console.log(err);
-            })}
+    async componentDidMount() {
+        if (this.props.userReducer) {
+            await authService.getUserData().then(res => {
+                this.setState({ username: res.data.user.username })
+
+                this.props.setUser(res.data.user)
+
+            }).catch(err => {
+                console.log(err);
+            })
+        }
         let temp, arr = []
         temp = [...this.props.navigation.state.params.items.subCategory]
         temp.forEach(
@@ -122,6 +125,13 @@ console.log(item._id);
         }
 
     }
+    renderItem = ({ item }) => (
+        <Product handlePress={() => this.handlePress(item)}
+            handleLike={(e) => { this.handleLike(e, item) }}
+            handleCartAddOne={() => this.handleCartAddOne(item)}
+            src={item}
+        />)
+
 
     render() {
         return (
@@ -147,7 +157,7 @@ console.log(item._id);
                         <Text style={{
                             fontFamily: 'Cairo-Regular',
                             fontSize: 20,
-                        }}>{this.props.navigation.state.params.items.nameEN}</Text>
+                        }}>{I18nManager.isRTL ? this.props.navigation.state.params.items.nameAR : this.props.navigation.state.params.items.nameEN}</Text>
                     </View>
                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                         <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingLeft: 30, width: "70%" }}
@@ -180,7 +190,7 @@ console.log(item._id);
                                         height: "100%", alignItems: 'center', justifyContent: 'center', flex: 1, flexDirection: 'row'
                                     }}
                                         onPress={() => { this._handlePressOfSubCategory(item._id) }}>
-                                        <Text style={{ fontSize: 16, padding: 10, fontFamily: "Cairo-Regular" }}>{item.nameEN}</Text>
+                                        <Text style={{ fontSize: 16, padding: 10, fontFamily: "Cairo-Regular" }}>{I18nManager.isRTL ? item.nameAR : item.nameEN}</Text>
                                     </TouchableOpacity>
 
 
@@ -192,36 +202,27 @@ console.log(item._id);
                     </View>
 
                     <View style={styles.grid}>
-                        <FlatList
+                        {this.state._isLoaded ?
+                            <FlatList
 
-                            style={{ marginBottom: Dimensions.get('window').height * 70 / 812 }}
-                            key={item => { item.id }}
-                            showsVerticalScrollIndicator={false}
-                            contentContainerStyle={styles.grid}
-                            data={this.state.data}
-                            renderItem={({ item }) =>
+                                style={{ marginBottom: Dimensions.get('window').height * 70 / 812 }}
+                                key={item => { item.id }}
+                                showsVerticalScrollIndicator={false}
+                                contentContainerStyle={styles.grid}
+                                data={this.state.data}
+                                renderItem={this.renderItem}
+                                numColumns={2}
+                                refreshControl={
+                                    <RefreshControl
+                                        refreshing={this.state.refreshing}
+                                        onRefresh={this.onRefresh}
+                                    />
+                                }
 
-
-                                // <Text>sd</Text>
-
-
-                                <Product handlePress={() => this.handlePress(item)}
-                                    handleLike={(e) => { this.handleLike(e, item) }}
-                                    handleCartAddOne={() => this.handleCartAddOne(item)}
-                                    src={item}
-                                />
-
-                            }
-                            numColumns={2}
-                            refreshControl={
-                                <RefreshControl
-                                    refreshing={this.state.refreshing}
-                                    onRefresh={this.onRefresh}
-                                />
-                            }
-
-                        >
-                        </FlatList>
+                            >
+                            </FlatList> :
+                            <ActivityIndicator size={50} color={colors.primary} />
+                        }
                     </View>
 
 

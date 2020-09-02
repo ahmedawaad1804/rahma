@@ -1,5 +1,5 @@
 import React , { useState }from 'react';
-import { StyleSheet, Text, View, CheckBox, TouchableHighlight, Button, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, CheckBox, TouchableHighlight,I18nManager, Button, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
 import store from '../../store'
 import { connect } from 'react-redux'
 /* colors */
@@ -38,11 +38,11 @@ export default Product = (data) => {
 
             </TouchableOpacity>
             <View style={styles.textHolder}>
-                <Text style={styles.productNameFont}>{data.src.productNameEN} </Text>
-                <Text style={styles.descriptionFont}>{data.src.descriptionEN}</Text>
+                <Text style={styles.productNameFont}>{I18nManager.isRTL?data.src.productNameAR:data.src.productNameEN} </Text>
+                <Text style={styles.descriptionFont}>{I18nManager.isRTL?data.src.descriptionAR:data.src.descriptionEN}</Text>
                 <View style={{ flexDirection: 'row' }}>
                     <View>
-                        <Text style={styles.price}>{data.src.price} EGP</Text>
+                        <Text style={styles.price}>{data.src.price} {I18nManager.isRTL?"ج.م":"EGP"}</Text>
                     </View>
                     {( !(data.src.discount === 0)) && <View style={{ alignItems: "flex-end", flex: 1, justifyContent: 'center' }}>
                         <Text style={styles.discount}>{data.src.discountPrice}</Text>

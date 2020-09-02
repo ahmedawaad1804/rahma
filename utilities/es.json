@@ -1,4 +1,6 @@
-
 {
-    "welcome": "Bienvenida al tutorial de traducción"
+    "login": "Login",
+    "rgister":"Register",
+    "skip":"Skip"
+
 }

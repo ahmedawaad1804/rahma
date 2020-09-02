@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, StatusBar, Dimensions, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, StatusBar, Dimensions, SafeAreaView ,I18nManager} from 'react-native';
 // import { StatusBar } from 'expo-status-bar';
 /*screens */
 import Navigation from './containers/Navigation/Navigation'
@@ -23,7 +23,12 @@ const fetchFonts = () => {
 
   });
 };
+import i18n from 'i18n-js';
 
+// Set the locale once at the beginning of your app.
+i18n.locale = I18nManager.isRTL?"ar":'en'
+// When a value is missing from a language it'll fallback to another language with the key present.
+i18n.fallbacks = true;
 
 export default class App extends React.Component {
   constructor(props) {

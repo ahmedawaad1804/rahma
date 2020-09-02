@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, RefreshControl, FlatList, ActivityIndicator, Button, Animated, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, RefreshControl, FlatList, ActivityIndicator, Button, Animated, I18nManager, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
 import store from '../../store'
 import { connect } from 'react-redux'
 /* colors */
@@ -74,6 +74,14 @@ class Profile extends React.Component {
         this.props.navigation.navigate("MainScreenLoading")
 
     }
+    about() {
+        this.props.navigation.navigate("About")
+
+    }
+    setting() {
+        this.props.navigation.navigate("Setting")
+
+    }
 
     render() {
         return (
@@ -89,7 +97,7 @@ class Profile extends React.Component {
                     <View style={styles.phoneIconContainer}>
                         <Image source={require("../../assets/icons/phone.png")}
                             style={styles.phoneIcon} />
-                        <Text style={{ fontFamily: 'Cairo-Regular', fontSize: 12 }}> (02) 0{this.state.user.phoneNumber}</Text>
+                        <Text style={{ fontFamily: 'Cairo-Regular', fontSize: 12 }}> (02) 0{this.state.user.phoneNumber}    </Text>
                     </View>
 
 
@@ -114,8 +122,8 @@ class Profile extends React.Component {
                                         }
                                     }) : <Text>No adress yet</Text>}
                         </View>
-                        <View style={{ flex: 2.5, alignItems: 'center', flexDirection: 'row' }}>
-                            <Text style={{ fontFamily: 'Cairo-Regular', fontSize: 13 }}>Manage  </Text>
+                        <View style={{ flex: 2.5, alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}>
+                            <Text style={{ fontFamily: 'Cairo-Regular', fontSize: 13 }}>{I18nManager.isRTL ? " التحكم " : " Manage "}</Text>
                             <Image source={require("../../assets/icons/setting.png")}
                                 style={styles.phoneIcon} />
                         </View>
@@ -129,33 +137,36 @@ class Profile extends React.Component {
                             <Text style={{ fontFamily: 'Cairo-Regular', fontSize: 12 }}>Awarded Points</Text>
                             <Text style={{ fontFamily: 'Cairo-SemiBold', fontSize: 18 }}>625<Text style={{ fontFamily: 'Cairo-Regular', fontSize: 12 }}> Point</Text></Text>
                         </View>
-                        <View style={{ flex: 3, alignItems: 'center', flexDirection: 'row' }}>
-                            <Text style={{ fontFamily: 'Cairo-Regular', fontSize: 13 }}>Review   </Text>
+                        <View style={{ flex: 3, alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}>
+                            <Text style={{ fontFamily: 'Cairo-Regular', fontSize: 13 }}>{I18nManager.isRTL ? " تقييم " : " Review "}  </Text>
                             <Image source={require("../../assets/icons/rightArrow.png")}
                                 style={styles.phoneIcon} />
                         </View>
                     </TouchableOpacity>
                     <View style={styles.miniItemContainer}>
-                        <TouchableOpacity style={styles.miniItem}>
+                        <TouchableOpacity style={styles.miniItem}
+                            onPress={() => { this.setting() }}>
                             <Image source={require("../../assets/icons/twoSetting.png")}
                                 style={styles.miniItemImage} />
-                            <Text style={{ fontFamily: 'Cairo-Regular', fontSize: 12 }}>Settings</Text>
+                            <Text style={{ fontFamily: 'Cairo-Regular', fontSize: 12 }}>{I18nManager.isRTL ? " الضبط" : "Setting"} </Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.miniItem}>
+                        <TouchableOpacity style={styles.miniItem}
+                            onPress={() => { this.contactUs() }}>
                             <Image source={require("../../assets/icons/contactUs.png")}
                                 style={styles.miniItemImage} />
-                            <Text style={{ fontFamily: 'Cairo-Regular', fontSize: 12 }}>Contact us</Text>
+                            <Text style={{ fontFamily: 'Cairo-Regular', fontSize: 12 }}>{I18nManager.isRTL ? "اتصل بنا" : "Contact us"}</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.miniItem}>
+                        <TouchableOpacity style={styles.miniItem}
+                            onPress={() => { this.about() }}>
                             <Image source={require("../../assets/icons/aboutUs.png")}
                                 style={styles.miniItemImage} />
-                            <Text style={{ fontFamily: 'Cairo-Regular', fontSize: 12 }}>About</Text>
+                            <Text style={{ fontFamily: 'Cairo-Regular', fontSize: 12 }}>{I18nManager.isRTL ? "من نحن ؟" : "About"}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.miniItem}
                             onPress={() => { this.logout() }}>
                             <Image source={require("../../assets/icons/logOut.png")}
                                 style={styles.miniItemImage} />
-                            <Text style={{ fontFamily: 'Cairo-Regular', fontSize: 12 }}>Logout</Text>
+                            <Text style={{ fontFamily: 'Cairo-Regular', fontSize: 12 }}>{I18nManager.isRTL ? "الخروج" : "Logout"}</Text>
                         </TouchableOpacity>
                     </View>
 
@@ -242,13 +253,13 @@ const styles = StyleSheet.create({
         fontSize: 14
     },
     instructionText: {
-        marginLeft: Dimensions.get('window').width * 32 / 375,
+        marginHorizontal: Dimensions.get('window').width * 32 / 375,
         fontFamily: 'Cairo-Regular',
         fontSize: 13
         ,
     },
     headerText: {
-        marginLeft: Dimensions.get('window').width * 32 / 375,
+        marginHorizontal: Dimensions.get('window').width * 32 / 375,
         fontFamily: 'Cairo-Regular',
         fontSize: 20
         ,

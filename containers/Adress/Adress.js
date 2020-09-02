@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, RefreshControl, FlatList, ActivityIndicator, Button, Animated, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, RefreshControl, FlatList, ActivityIndicator, Button, Animated, Input, ScrollView, TouchableOpacity,I18nManager, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
 import store from '../../store'
 import { connect } from 'react-redux'
 /* colors */
@@ -98,7 +98,7 @@ class Adress extends React.Component {
                         <Text style={{
                             fontFamily: 'Cairo-Regular',
                             fontSize: 20,
-                        }}>Adress</Text>
+                        }}>{ I18nManager.isRTL ? "العنوان" : "Adress" }</Text>
                     </View>
                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
 
@@ -108,8 +108,8 @@ class Adress extends React.Component {
 
                 <View style={styles.mainContainer}>
                     {this.state.data.length ? <View style={{ alignItems: 'flex-start', width: Dimensions.get('window').width, paddingHorizontal: 20 }}>
-                        <Text style={styles.headerText}>Current Address</Text>
-                        <Text style={styles.subHeaderText}>You will be receiving your orders on this address</Text>
+                        <Text style={styles.headerText}>{I18nManager.isRTL ? "العنوان الحالي" : "Current Address"}</Text>
+                        <Text style={styles.subHeaderText}>{I18nManager.isRTL ? "إستلام الطلبات علي هذا العنوان" : "You will be receiving your orders on this address"}</Text>
                     </View> : null}
                     {
                         this.state.data.map(item => {
@@ -120,14 +120,14 @@ class Adress extends React.Component {
                     <View style={{ justifyContent: 'center', width: Dimensions.get('window').width, paddingHorizontal: 20, flexDirection: 'row', marginVertical: 7 }}>
                         <View style={{ flex: 1, }}>
 
-                            <Text style={styles.headerText}>My Address List</Text>
+                            <Text style={styles.headerText}>{I18nManager.isRTL ? "قائمة العناوين" : "My Address List"}</Text>
 
                         </View>
 
                         <View style={{ flex: 1, alignItems: "flex-end", justifyContent: 'center' }}>
 
                             <TouchableOpacity style={{ alignItems: "flex-end", justifyContent: 'center' }} onPress={() => { this.addAdress() }}>
-                                <Text style={[styles.addText, { backgroundColor: colors.primary, paddingHorizontal: 15, paddingVertical: 5, borderRadius: 50 }]}>Add +</Text>
+                                <Text style={[styles.addText, { backgroundColor: colors.primary, paddingHorizontal: 15, paddingVertical: 5, borderRadius: 50 }]}>{I18nManager.isRTL ? "إضافة +" : "Add +"}</Text>
                             </TouchableOpacity>
 
                         </View>

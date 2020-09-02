@@ -1,7 +1,8 @@
 import React from 'react';
-import { StyleSheet, Text, View, RefreshControl, FlatList, ActivityIndicator, Button, Animated, SectionList, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, RefreshControl, FlatList, ActivityIndicator, Button, Animated,I18nManager, SectionList, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
 import store from '../../store'
 import { connect } from 'react-redux'
+
 /* lodash */ 
 import { _ } from "lodash";
 /* colors */
@@ -29,8 +30,13 @@ import MainCategoryItem from '../../components/MainCategoryItem/MainCategoryItem
 /* pagination */
 import Carousel from 'react-native-snap-carousel';
 
+/* trans */
+import i18n from 'i18n-js';
 
-
+i18n.translations = {
+  en: require('../../utilities/en.json'),
+  ar: require('../../utilities/ar.json'),
+};
 
 class Home extends React.Component {
 
@@ -140,7 +146,8 @@ class Home extends React.Component {
   // if(event.nativeEvent.contentOffset.y<20){this.setState({borderRadius:40})}
   //   }
   navigateMainCategory(title, props) {
-    // console.log("pressed");
+    console.log("////////////////////");
+    console.log(props.item._id);
 
     this.props.navigation.navigate("MainCategory", { title, props })
 
@@ -247,7 +254,7 @@ class Home extends React.Component {
           autoplayInterval={4000}
         // loop={true}
         />
-        <Text style={styles.titleText}>Discover</Text>
+        <Text style={styles.titleText}>{i18n.t('discover')}</Text>
       </View>
       <View style={styles.horizontalScrollController}>
 
@@ -293,7 +300,7 @@ class Home extends React.Component {
             style={styles.mainImageStyle} />
           {/* <View style={{ backgroundColor: '#ccc', width: Dimensions.get('window').width * 90 / 400 }}></View> */}
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingRight: Dimensions.get('window').width * 18 / 375 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingHorizontal: Dimensions.get('window').width * 18 / 375 }}>
               <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
                 onPress={() => { this.props.navigation.navigate("Cart") }}>
                 <Image source={require("../../assets/icons/cart.png")}
@@ -326,7 +333,7 @@ class Home extends React.Component {
             <TextInput
               style={styles.textInputStyle}
               value={this.state.password}
-              placeholder="What are you looking for?"
+              placeholder={i18n.t('whatareulooking')}
               placeholderTextColor={'#ccc'}
               width={Dimensions.get('window').width * 3 / 5}
 
@@ -364,8 +371,8 @@ class Home extends React.Component {
                   showsVerticalScrollIndicator={false}
                   contentContainerStyle={styles.grid}
 
-                  sections={[{ title: "BEST SELLER", data: this.state.bestSellerProducts },
-                  { title: "LATEST OFFER", data: this.state.LatestOffersProducts }]}
+                  sections={[{ title: i18n.t('bs'), data: this.state.bestSellerProducts },
+                  { title: i18n.t('lf'), data: this.state.LatestOffersProducts }]}
                   renderSectionHeader={({ section: { title } }) => (
                     <View style={styles.textView}>
                       <Text style={styles.titleText}>{title}</Text>
@@ -376,20 +383,20 @@ class Home extends React.Component {
                     index % 2 == 0 &&
                     <View style={{ flexDirection: 'row' }}>
                       <Product
-                        handlePress={() => this.handlePress(section.title=="BEST SELLER"?this.state.bestSellerProducts[index]:this.state.LatestOffersProducts[index])}
-                        handleLike={(e) => { this.handleLike(e, section.title=="BEST SELLER"?this.state.bestSellerProducts[index]:this.state.LatestOffersProducts[index]) }}
-                        handleCartAddOne={() => this.handleCartAddOne(section.title=="BEST SELLER"?this.state.bestSellerProducts[index]:this.state.LatestOffersProducts[index])}
-                        src={section.title=="BEST SELLER"?this.state.bestSellerProducts[index]:this.state.LatestOffersProducts[index]}
-                      // section.title=="BEST SELLER"?this.state.bestSellerProducts[index]:this.state.LatestOffersProducts[index]
+                        handlePress={() => this.handlePress(section.title==i18n.t('bs')?this.state.bestSellerProducts[index]:this.state.LatestOffersProducts[index])}
+                        handleLike={(e) => { this.handleLike(e, section.title==i18n.t('bs')?this.state.bestSellerProducts[index]:this.state.LatestOffersProducts[index]) }}
+                        handleCartAddOne={() => this.handleCartAddOne(section.title==i18n.t('bs')?this.state.bestSellerProducts[index]:this.state.LatestOffersProducts[index])}
+                        src={section.title==i18n.t('bs')?this.state.bestSellerProducts[index]:this.state.LatestOffersProducts[index]}
+                      // section.title==i18n.t('bs')?this.state.bestSellerProducts[index]:this.state.LatestOffersProducts[index]
                       />
                       {
-                        // console.log(section.title=="BEST SELLER"?"bs":"lo"),
-                        (section.title=="BEST SELLER"?this.state.bestSellerProducts[index+1]:this.state.LatestOffersProducts[index+1]) &&
+                        // console.log(section.title==i18n.t('bs')?"bs":"lo"),
+                        (section.title==i18n.t('bs')?this.state.bestSellerProducts[index+1]:this.state.LatestOffersProducts[index+1]) &&
                         <Product
-                          handlePress={() => this.handlePress(section.title=="BEST SELLER"?this.state.bestSellerProducts[index+1]:this.state.LatestOffersProducts[index+1])}
-                          handleLike={(e) => { this.handleLike(e, section.title=="BEST SELLER"?this.state.bestSellerProducts[index+1]:this.state.LatestOffersProducts[index+1]) }}
-                          handleCartAddOne={() => this.handleCartAddOne(section.title=="BEST SELLER"?this.state.bestSellerProducts[index+1]:this.state.LatestOffersProducts[index+1])}
-                          src={section.title=="BEST SELLER"?this.state.bestSellerProducts[index+1]:this.state.LatestOffersProducts[index+1]}
+                          handlePress={() => this.handlePress(section.title==i18n.t('bs')?this.state.bestSellerProducts[index+1]:this.state.LatestOffersProducts[index+1])}
+                          handleLike={(e) => { this.handleLike(e, section.title==i18n.t('bs')?this.state.bestSellerProducts[index+1]:this.state.LatestOffersProducts[index+1]) }}
+                          handleCartAddOne={() => this.handleCartAddOne(section.title==i18n.t('bs')?this.state.bestSellerProducts[index+1]:this.state.LatestOffersProducts[index+1])}
+                          src={section.title==i18n.t('bs')?this.state.bestSellerProducts[index+1]:this.state.LatestOffersProducts[index+1]}
                         />}
                     </View>
 
@@ -515,7 +522,7 @@ const styles = StyleSheet.create({
     padding: 15
   },
   titleText: {
-    marginLeft: Dimensions.get('window').width * 15 / 375,
+    marginHorizontal: Dimensions.get('window').width * 15 / 375,
     fontFamily: 'Cairo-Bold',
     fontSize: 20,
     backgroundColor: colors.white
@@ -523,8 +530,8 @@ const styles = StyleSheet.create({
   textView: {
     alignItems: 'flex-start',
     justifyContent: 'center',
-    width: Dimensions.get('window').width - 100,
-    marginRight: 100,
+    width: Dimensions.get('window').width - 0,
+    // marginRight: 100,
 
   },
   smallText: {
@@ -592,7 +599,7 @@ const styles = StyleSheet.create({
   },
   horizontalScrollController: {
     height: Dimensions.get('window').height * 95 * 2.3 * .95 / 812,
-    marginLeft: 10
+    marginHorizontal: 10
   },
   yellowContainer: {
     flexDirection: 'row',

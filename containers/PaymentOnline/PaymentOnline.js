@@ -11,7 +11,8 @@ import { Avatar, Badge, Icon, withBadge } from 'react-native-elements'
 import { setCartModifications } from '../../actions/product'
 import { Header } from 'react-navigation';
 import io from 'socket.io-client'
-
+/* webview */  
+import { WebView } from 'react-native-webview';
 /* toast */
 // import Toast from 'react-native-simple-toast';
 /* component */
@@ -21,7 +22,7 @@ import orderService from "../../services/orderService"
 
 import RadioForm, { RadioButton, RadioButtonInput, RadioButtonLabel } from 'react-native-simple-radio-button';
 
-class Payment extends React.Component {
+class PaymentOnline extends React.Component {
     static navigationOptions = { header: null }
 
     state = {
@@ -32,49 +33,26 @@ class Payment extends React.Component {
         data: {}
     };
 
-    componentDidMount() {
-        this.setState({ data: this.props.navigation.state.params })
-        // console.log(this.props.navigation.state.params);
-        // const socket = socketIOClient("http://192.168.1.6:3001");
-        // socket.on("FromAPI", data => {
-        //     console.log(data);
-        //   });
-        this.socket = io("http://192.168.1.6:5001");
-        this.socket.on('some event', (x) => console.log(x))
-        // this.socket.on("chat message", mssg => {
-        //   console.log("mssg recieved in client:", mssg)
-        // })
+   async componentDidMount() {
+        console.log("hi");
+        let responseData=await fetch('https://www.paytabs.com/apiv3/tokenized_transaction_prepare',{
+            method:"POST",
+            body: JSON.stringify({
+                merchant_email:"beemallalex@gmail.com",
+                secret_key:"vL8heE3VXm9HcAtC9mKfqxZZwBl3XFKtqSKExNAuaJbmkFZu1KKshJrNlMRjsCMSvxx2k7wvRIRboQGpAqRSajGv6yOyaBqF8YHt"
+            }),
+            // headers: {
+            //     'Content-type': 'application/json; charset=UTF-8'
+            // }
+                
+            
+        }
+        )
+        const res = await responseData.json()
+        console.log(res);
     }
     componentWillUnmount() {
-        console.log("unumount")
-        this.socket.disconnect();
-    }
-    placeOrder() {
-        // console.log(this.state.data.products);
-        if(this.state.value3Index==0){
-        let tempProductsArr = []
-        this.state.data.products.forEach(element => {
-            tempProductsArr.push({ count: element.count, productId: element.item._id })
-        })
-        orderService.placeOrder({
-            products: tempProductsArr,
-            totalOrder: this.state.data.totalOrder,
-            scheduled: this.state.data.scheduled,
-            scheduledDate: this.state.data.scheduledDate,
-            address: this.state.data.address,
-            paymentType: "cdff",
-            paymentInfo: null,
-            promoCode: this.state.data.promoCode
 
-
-        }).then(res => {
-            console.log(res.data);
-        }).catch(err => {
-            console.log(err.response.data);
-        })}
-        else if(this.state.value3Index==1){
-            this.props.navigation.navigate("PaymentOnline")
-        }
     }
 
     render() {
@@ -115,49 +93,9 @@ class Payment extends React.Component {
                 </View>
 
                 <View style={styles.mainContainer}>
-                    <View style={{ alignItems: 'flex-start', width: "100%", marginTop: 20 }}>
-                        <Text style={styles.titleText}>Payment Method</Text>
-                        <Text style={styles.Text}>Select your preferred payment method</Text>
-                    </View>
-                    <View style={{ alignItems: 'flex-start', justifyContent: 'center', marginTop: 50, paddingHorizontal: 40 }}>
-                        <RadioForm
-
-                            initial={0}
-                            buttonColor={colors.primary}
-
-                        >
-                            {
-                                [{ label: 'Cash On Delivery', value: 0 }, { label: 'Credit Card', value: 1 }].map((obj, i) => (
-                                    <RadioButton labelHorizontal={true} key={i} >
-                                        {/*  You can set RadioButtonLabel before RadioButtonInput */}
-                                        <RadioButtonInput
-                                            obj={obj}
-                                            index={i}
-                                            isSelected={this.state.value3Index === i}
-                                            onPress={(value) => { this.setState({ value3Index: value },()=>{console.log(this.state.value3Index);})  }}
-                                            borderWidth={1}
-                                            buttonInnerColor={'#000'}
-                                            buttonOuterColor={this.state.value3Index === i ? colors.primary : '#ccc'}
-                                            buttonSize={15}
-                                            buttonOuterSize={35}
-                                            buttonStyle={{ backgroundColor: this.state.value3Index === i ? colors.primary : "#ccc" }}
-                                            buttonWrapStyle={{ marginVertical: 5 }}
-                                        />
-                                        <RadioButtonLabel
-                                            obj={obj}
-                                            index={i}
-                                            labelHorizontal={true}
-                                            onPress={(value) => { this.setState({ value3Index: value }) }}
-                                            // onPress={onPress}
-                                            labelStyle={{ fontSize: 16, color: colors.black, fontFamily: 'Cairo-Regular', }}
-                                            labelWrapStyle={{}}
-                                        />
-                                    </RadioButton>
-                                ))
-                            }
-                        </RadioForm>
-
-                    </View>
+                   
+                        
+                        {/* <WebView source={{ uri: 'https://reactnative.dev/' }} /> */}
                     <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 30 }}>
                         <TouchableOpacity style={{
                             width: "80%", justifyContent: 'center', alignItems: 'center', borderRadius: 30, backgroundColor: colors.primary
@@ -275,4 +213,4 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
     setCartModifications,
 };
-export default connect(mapStateToProps, mapDispatchToProps)(Payment)
+export default connect(mapStateToProps, mapDispatchToProps)(PaymentOnline)

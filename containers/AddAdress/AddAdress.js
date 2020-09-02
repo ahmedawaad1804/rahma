@@ -1,9 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text, View, RefreshControl, FlatList, ActivityIndicator, Picker, Button, Animated, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, RefreshControl, FlatList, ActivityIndicator, Picker, Button, Animated, Input, ScrollView, I18nManager, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
 import store from '../../store'
 import { connect } from 'react-redux'
 /* colors */
 import colors from '../../colors'
+/* spinner */
+import Spinner from 'react-native-loading-spinner-overlay';
 /* padge */
 import { Avatar, Badge, Icon, withBadge } from 'react-native-elements'
 import { setCart } from '../../actions/product'
@@ -24,6 +26,7 @@ import adressService from '../../services/adressService'
 import dataService from '../../services/dataService';
 class AddAdress extends React.Component {
     state = {
+        visible: false,
         country: "Egypt",
         city: null,
         administrative_area: null,
@@ -31,8 +34,8 @@ class AddAdress extends React.Component {
         route: null,
         street: null,
         appartement: null,
-        lat:null,
-        long:null,
+        lat: null,
+        long: null,
         cityList: [{
             value: 'Alex',
         }, {
@@ -50,7 +53,7 @@ class AddAdress extends React.Component {
         ],
         errorMessage: " ",
         _error: false,
-        _isLoading:false
+        _isLoading: false
 
     };
 
@@ -66,12 +69,13 @@ class AddAdress extends React.Component {
 
 
     getLocationAsync = async () => {
+        this.setState({ visible: true })
         let status = await Permissions.askAsync(Permissions.LOCATION)
         // console.log(status);
         let location = await Location.getCurrentPositionAsync({})
-        console.log(location);
+        // console.log(location);
         this.setState({ location })
-        Geocoder.init("AIzaSyD7arViUQWyZhROPL4HKcujDdNy_fi2XW4");
+        Geocoder.init("AIzaSyD7arViUQWyZhROPL4HKcujDdNy_fi2XW4", { language: I18nManager.isRTL ? "ar" : "en" });
         Geocoder.from(this.state.location.coords.latitude, this.state.location.coords.longitude)
             .then(json => {
                 let street = json.results[0].address_components[0].long_name;
@@ -88,43 +92,50 @@ class AddAdress extends React.Component {
                     city,
                     country,
                     current: false,
-                    lat:this.state.location.coords.latitude,
-                    long:this.state.location.coords.longitude,
+                    lat: this.state.location.coords.latitude,
+                    long: this.state.location.coords.longitude,
                 },
-                    
-                    
+
                     // console.log("any")
                     setTimeout(() => {
-                    dataService.addAdress(this.props.adressReducer).then().catch(err=>console.log(err))
-                        
+                        dataService.addAdress(this.props.adressReducer).then().catch(err => console.log(err))
+
                     }, 500)
-                    )
+                )
+                console.log(json.results[0]);
+                // console.log("done");
+                this.props.navigation.goBack()
+                this.setState({ visible: false })
+
 
             })
-            .catch(error =>
+            .catch(error => {
                 console.warn(error)
-            );
+                this.props.navigation.goBack()
+                this.setState({ visible: false })
+            });
+
 
     }
     addAdressToReducer() {
         if (this.state.country && this.state.city && this.state.administrative_area
             && this.state.neighbourhood && this.state.route && this.state.appartement) {
-                this.props.addAdress({
-                    street: this.state.street,
-                    route: this.state.route,
-                    neighbourhood: this.state.neighbourhood,
-                    administrative_area: this.state.administrative_area,
-                    city: this.state.city,
-                    country: this.state.country,
-                    current: false,
-                    lat:null,
-                    long:null
-                })
-                setTimeout(() => {
-                    dataService.addAdress(this.props.adressReducer).then().catch(err=>console.log(err))
-                        
-                    }, 500)
-                    
+            this.props.addAdress({
+                street: this.state.street,
+                route: this.state.route,
+                neighbourhood: this.state.neighbourhood,
+                administrative_area: this.state.administrative_area,
+                city: this.state.city,
+                country: this.state.country,
+                current: false,
+                lat: null,
+                long: null
+            })
+            setTimeout(() => {
+                dataService.addAdress(this.props.adressReducer).then().catch(err => console.log(err))
+
+            }, 500)
+
         }
         else {
             this.setState({ _error: true })
@@ -154,31 +165,34 @@ class AddAdress extends React.Component {
                         </TouchableOpacity>
                     </View>
                     <View style={{ flex: 2, alignItems: 'center', justifyContent: 'center' }}>
-                        <Text style={{ fontFamily: 'Cairo-Regular', fontSize: 20, }}>Add Adress</Text>
+                        <Text style={{ fontFamily: 'Cairo-Regular', fontSize: 20, }}>{ I18nManager.isRTL ? "أضافة عنوان" : "Add Adress" }</Text>
                     </View>
                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
 
                     </View>
 
                 </View>
-
+                <View style={{ flex: 1 }}>
+                    <Spinner visible={this.state.visible} textContent={"Loading..."} textStyle={{ color: colors.white }} />
+                </View>
                 <View style={styles.mainContainer}>
+
                     {this.state._error && (<Text style={styles.errorText}>{this.state.errorMessage}</Text>)}
                     {!this.state._error && (<Padv height={22} />)}
                     <Dropdown
-                        label='City'
+                        label={ I18nManager.isRTL ? "المدينة" : 'City' }
                         data={this.state.cityList}
                         containerStyle={{ width: 150 }}
                         onChangeText={(text) => this.setState({ city: text })}
                     />
                     <Dropdown
-                        label='Strict'
+                        label={ I18nManager.isRTL ? "المقاطعة" : 'Strict' }
                         data={this.state.administrative_areaList}
                         containerStyle={{ width: 150 }}
                         onChangeText={(text) => this.setState({ administrative_area: text })}
                     />
                     <Dropdown
-                        label='Strict'
+                        label={ I18nManager.isRTL ? "الحي" : 'Neighborhood' }
                         data={this.state.administrative_areaList}
                         containerStyle={{ width: 150 }}
                         onChangeText={(text) => this.setState({ neighbourhood: text })}
@@ -187,7 +201,7 @@ class AddAdress extends React.Component {
                         <View style={styles.textInputView}>
                             <TextInput
                                 style={styles.textInputStyle}
-                                placeholder="Street"
+                                placeholder={ I18nManager.isRTL ? "الشارع" : 'Street' }
                                 value={this.state.route}
                                 placeholderTextColor={'#ccc'}
                                 width={Dimensions.get('window').width * 4 / 5}
@@ -201,7 +215,7 @@ class AddAdress extends React.Component {
                         <View style={styles.textInputView}>
                             <TextInput
                                 style={styles.textInputStyle}
-                                placeholder="building"
+                                placeholder={ I18nManager.isRTL ? "المبني" : 'building' }
                                 value={this.state.street}
                                 placeholderTextColor={'#ccc'}
                                 width={Dimensions.get('window').width * 4 / 5}
@@ -215,7 +229,7 @@ class AddAdress extends React.Component {
                         <View style={styles.textInputView}>
                             <TextInput
                                 style={styles.textInputStyle}
-                                placeholder="Appartement"
+                                placeholder={ I18nManager.isRTL ? "الشقة" : 'Appartement' }
                                 value={this.state.appartement}
                                 placeholderTextColor={'#ccc'}
                                 width={Dimensions.get('window').width * 4 / 5}
@@ -227,11 +241,11 @@ class AddAdress extends React.Component {
                     </View>
 
                     <TouchableOpacity style={[styles.tOpacity, { marginVertical: 20 }]} onPress={() => { this.addAdressToReducer() }}>
-                        <Text style={styles.text}>Add Adress</Text>
+                        <Text style={styles.text}>{ I18nManager.isRTL ? "أضافة عنوان" : "Add Adress" }</Text>
                     </TouchableOpacity>
-                    <Text style={[styles.text, { marginVertical: 20, fontSize: 20 }]}>OR</Text>
+                    <Text style={[styles.text, { marginVertical: 20, fontSize: 20 }]}>{ I18nManager.isRTL ? "او" : "OR" }</Text>
                     <TouchableOpacity style={[styles.tOpacity, { flexDirection: 'row' }]} onPress={() => { this.getLocationAsync() }}>
-                        <Text style={styles.text}>Use Location</Text>
+                        <Text style={styles.text}>{ I18nManager.isRTL ? "إستخدام الموقع الحالي" : "Use Location" }</Text>
                         <Image
                             source={require('../../assets/icons/triger.png')}
                             style={{

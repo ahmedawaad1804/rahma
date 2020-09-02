@@ -1,12 +1,15 @@
 import React from 'react';
 import { AsyncStorage } from 'react-native';
-import { StyleSheet, Text, View, Platform, Animated, Alert, CheckBox, ActivityIndicator, Button, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, Platform, Animated, Alert, UIManager, I18nManager, CheckBox, ActivityIndicator, Button, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
 import store from '../../store'
 import { connect } from 'react-redux'
 /* localization */
+import { Restart } from 'fiction-expo-restart';
+import RNRestart from 'react-native-restart';
 import * as Localization from 'expo-localization';
-import i18n from 'i18n-js';
 import { IMLocalized, init } from '../../utilities/IMLocalized';
+/* menu */
+import Menu, { MenuItem, MenuDivider } from 'react-native-material-menu';
 /* token */
 import { setToken } from '../../utility/storage'
 /* colors */
@@ -26,6 +29,12 @@ import Spinner from 'react-native-loading-spinner-overlay';
 /* google */
 import * as Google from 'expo-google-app-auth';
 // ios clientID=628256299763-a7af1lisn6f4vh8vt6g2uhu4l8sp8k31.apps.googleusercontent.com
+import i18n from 'i18n-js';
+
+i18n.translations = {
+  en: require('../../utilities/en.json'),
+  ar: require('../../utilities/ar.json'),
+};
 class Login extends React.Component {
   ////
   FBlogIn = async () => {
@@ -94,7 +103,12 @@ class Login extends React.Component {
     this.setState({ visible: true })
     try {
 
-      const { type, accessToken, user } = await Google.logInAsync({ androidClientId: "628256299763-6ufb00uro0ehiog4s8ud0hd3hs6jd0ft.apps.googleusercontent.com" });
+      const { type, accessToken, user } = await Google.logInAsync({
+        // clientId:Platform.OS === 'android'?"628256299763-6ufb00uro0ehiog4s8ud0hd3hs6jd0ft.apps.googleusercontent.com":"628256299763-a7af1lisn6f4vh8vt6g2uhu4l8sp8k31.apps.googleusercontent.com",
+        iosClientID: "628256299763-a7af1lisn6f4vh8vt6g2uhu4l8sp8k31.apps.googleusercontent.com",
+        androidClientId: "628256299763-6ufb00uro0ehiog4s8ud0hd3hs6jd0ft.apps.googleusercontent.com",
+        androidStandaloneAppClientId: "628256299763-0ekmucvo47ervaq6d6ge80trnkme17u4.apps.googleusercontent.com"
+      });
       if (type === 'success') {
         // Then you can use the Google REST API
         let userInfoResponse = await fetch('https://www.googleapis.com/userinfo/v2/me', {
@@ -121,14 +135,12 @@ class Login extends React.Component {
 
               this.props.navigation.navigate("VerifyFBSignUp", { userData, token: null, fbImage: userData.picture })
             }
-
-
           }
 
         ).catch(
           err => {
             console.log(err);
-            this.setState({ visible: false })
+            this.setState({ visible: false, _error: true, errorMessage: err.response.data })
 
           }
         )
@@ -141,7 +153,7 @@ class Login extends React.Component {
 
     } catch ({ message }) {
       console.log(message);
-      this.setState({ visible: false })
+      this.setState({ visible: false, _error: true, errorMessage: message })
 
     }
     this.setState({ visible: false })
@@ -163,6 +175,44 @@ class Login extends React.Component {
 
     animeHeight: new Animated.Value(Dimensions.get('window').height * 2)
   }
+  setMenuRef = ref => {
+
+    this._menu = ref;
+  };
+
+  hideMenu = (string) => {
+
+    this._menu.hide();
+  };
+
+  showMenu = (string) => {
+    this._menu.show();
+  }
+  changeLang(item) {
+    console.log(item);
+    // if(item == 'ar'){console.log("any");}
+    if (item == 'ar' && !I18nManager.isRTL) {
+      setTimeout(() => {
+        I18nManager.forceRTL(!I18nManager.isRTL)
+        Restart();
+      }, 500);
+
+    }
+    else if (item == 'en' && I18nManager.isRTL) {
+      setTimeout(() => {
+        I18nManager.forceRTL(!I18nManager.isRTL)
+        Restart();
+      }, 500);
+
+    }
+    else if (item == 'ar' && I18nManager.isRTL) {
+      this.setState({ _error: true, errorMessage: "انت تستخدم اللغة العربية" })
+    }
+    else if (item == 'en' && !I18nManager.isRTL) {
+      this.setState({ _error: true, errorMessage: "ُEnglish is used" })
+    }
+
+  }
   componentDidMount() {
     Animated.timing(this.state.animeHeight, {
       toValue: Dimensions.get('window').height,
@@ -171,12 +221,14 @@ class Login extends React.Component {
     // store.dispatch(getProducts())
     // this.props.updateLang({asd:"asdsd"})
     this._handleRememberMeGet()
-    // console.log(Localization );
+    console.log(I18nManager);
+    // I18nManager.forceRTL(true)
     // console.log(Localization.locales);
-    i18n.locale = "cc"
+    // i18n.locale = "cc"
     // console.log(i18n);
-
-
+    // if (UIManager.setLayoutAnimationEnabledExperimental)
+    // {UIManager.setLayoutAnimationEnabledExperimental(false);}
+    // console.log(UIManager.setLayoutAnimationEnabledExperimental);
 
 
   }
@@ -192,6 +244,12 @@ class Login extends React.Component {
 
     this.setState({ errorMessage: " " })
   }
+  _test() {
+    console.log(i18n);
+
+    I18nManager.forceRTL(!I18nManager.isRTL)
+    Restart();
+  }
   _handleSubmit() {
     if (this.state.phonenumber) {
       if (this.state.phonenumber.length <= 10) {
@@ -206,8 +264,7 @@ class Login extends React.Component {
     }
     if (this.state.password) {
       if (this.state.password.length < 8) {
-        this.setState({ _error: true })
-        this.setState({ errorMessage: "Password minimum lenght 8 characters" })
+        this.setState({ _error: true, errorMessage: "Password minimum lenght 8 characters" })
 
       }
     }
@@ -300,11 +357,31 @@ class Login extends React.Component {
             <Spinner visible={this.state.visible} textContent={"Loading..."} textStyle={{ color: colors.white }} />
           </View>
 
-          <Padv height={40} />
+          {/* <Padv height={40} /> */}
+          <View style={styles.iconViewLangCont}>
+            <TouchableOpacity style={styles.iconViewLang} onPress={() => { this.showMenu() }}>
+              <Image source={require("../../assets/icons/lang.png")}
+                style={styles.imageStyle} />
+              <View style={{ position: 'absolute', flex: 1, alignItems: 'center', justifyContent: 'center', height: "100%", width: 30 }}>
+                <Menu
+                  style={{ borderRadius: 20 }}
+                  ref={this.setMenuRef}
+                >
+                  <MenuItem onPress={() => { this.hideMenu(), this.changeLang("ar") }}>
+                    <Text>العربية</Text></MenuItem>
+                  <MenuItem onPress={() => { this.hideMenu(), this.changeLang("en") }}
+                  >
+                    <Text styles={{ justifyContent: 'flex-end' }}>English</Text>
 
+                  </MenuItem>
 
+                </Menu>
+
+              </View>
+            </TouchableOpacity>
+          </View>
           <View style={styles.textView}>
-            <Text style={styles.titleText}>Login</Text>
+            <Text style={styles.titleText}>{i18n.t('login')}</Text>
           </View>
           <Padv height={8} />
           {this.state._error && (<Text style={styles.errorText}>{this.state.errorMessage}</Text>)}
@@ -319,7 +396,7 @@ class Login extends React.Component {
             <View style={styles.textInputView}>
               <TextInput
                 style={styles.textInputStyle}
-                placeholder="Phone Number"
+                placeholder={i18n.t('phone')}
                 value={this.state.phonenumber}
                 placeholderTextColor={'#ccc'}
                 width={Dimensions.get('window').width * 3 / 5}
@@ -344,7 +421,7 @@ class Login extends React.Component {
               <TextInput
                 style={styles.textInputStyle}
                 value={this.state.password}
-                placeholder="Password"
+                placeholder={i18n.t('pass')}
                 placeholderTextColor={'#ccc'}
                 width={Dimensions.get('window').width * 3 / 5}
 
@@ -366,13 +443,13 @@ class Login extends React.Component {
 
           <TouchableOpacity style={styles.tOpacity}
             // disabled={this.state._ckeckSignIn}
-            onPress={() => this._handleSubmit()}>
+            onPress={() => this._test()}>
             {
               this.state._ckeckSignIn && (<ActivityIndicator size={20} color={colors.black} />)
 
             }
             {
-              !this.state._ckeckSignIn && (<Text style={styles.text}>Login</Text>)
+              !this.state._ckeckSignIn && (<Text style={styles.text}>{i18n.t('login')}</Text>)
             }
 
           </TouchableOpacity>
@@ -392,10 +469,10 @@ class Login extends React.Component {
                 onValueChange={() => { this.setState({ checked: !this.state.checked }) }}
 
               />
-              <Text style={styles.smallText}>Keep me in</Text>
-              <View style={{ backgroundColor: '#ccc', width: Dimensions.get('window').width * 14 / 30 }}></View>
+              <Text style={styles.smallText}>{i18n.t('keepmein')}</Text>
+              <View style={{ flex: 1 }}></View>
               <TouchableOpacity onPress={() => { this.props.navigation.navigate("Forgot") }}>
-                <Text style={styles.smallTextUnderLine}>Forgot Password</Text>
+                <Text style={styles.smallTextUnderLine}>{i18n.t('forget')}</Text>
               </TouchableOpacity>
 
 
@@ -444,11 +521,11 @@ class Login extends React.Component {
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', }}>
             <TouchableOpacity onPress={() => { this.props.navigation.navigate("Register") }}>
-              <Text style={styles.textBelow}>Register</Text>
+              <Text style={styles.textBelow}>{i18n.t('rgister')}</Text>
             </TouchableOpacity >
             <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', }} >
               <TouchableOpacity onPress={() => { this.props.navigation.navigate("MainTabNavigator") }}>
-                <Text style={styles.textBelow}>Skip</Text>
+                <Text style={styles.textBelow}>{i18n.t('skip')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -488,9 +565,31 @@ const styles = StyleSheet.create({
     height: Dimensions.get('window').height * 46 / 812,
   },
   iconView: {
+    borderTopLeftRadius: I18nManager.isRTL ? 0 : 35,
+    borderBottomLeftRadius: 35,
+    borderBottomRightRadius: 35,
+    borderTopRightRadius: I18nManager.isRTL ? 35 : 0,
+    // I18nManager.isRTL
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    backgroundColor: '#FFF064',
+    width: Dimensions.get('window').width * 54 / 375,
+    height: Dimensions.get('window').height * 46 / 812,
+
+  },
+  iconViewLangCont: {
+    flex: 1,
+    flexDirection: "row",
+    alignSelf: 'flex-end',
+    marginHorizontal: 20
+  },
+  iconViewLang: {
     borderTopLeftRadius: 35,
     borderBottomLeftRadius: 35,
     borderBottomRightRadius: 35,
+    borderTopRightRadius: 35,
+    // I18nManager.isRTL
     alignItems: 'center',
     justifyContent: 'center',
 
@@ -554,15 +653,15 @@ const styles = StyleSheet.create({
     padding: 15
   },
   titleText: {
-    marginLeft: Dimensions.get('window').width * 32 / 375,
+    // marginLeft: Dimensions.get('window').width * 32 / 375,
     fontFamily: 'Cairo-Bold',
     fontSize: 20
   },
   textView: {
     alignItems: 'flex-start',
     justifyContent: 'center',
-    width: Dimensions.get('window').width - 85,
-    marginRight: 85
+    width: Dimensions.get('window').width,
+    paddingHorizontal: 50
 
   },
   smallText: {
@@ -587,7 +686,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     width: Dimensions.get('window').width * (343) / 375,
 
-  }
+  },
+  smallIcon: {
+    width: 20,
+    height: 20,
+    resizeMode: "contain",
+
+  },
 });
 const mapStateToProps = state => ({
 

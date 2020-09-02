@@ -304,13 +304,13 @@ const styles = StyleSheet.create({
         fontSize: 14
     },
     instructionText: {
-        marginLeft: Dimensions.get('window').width * 32 / 375,
+        marginHorizontal: Dimensions.get('window').width * 32 / 375,
         fontFamily: 'Cairo-Regular',
         fontSize: 13
         ,
     },
     headerText: {
-        marginLeft: Dimensions.get('window').width * 32 / 375,
+        marginHorizontal: Dimensions.get('window').width * 32 / 375,
         fontFamily: 'Cairo-Regular',
         fontSize: 20
         ,

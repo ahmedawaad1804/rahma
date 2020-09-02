@@ -14,8 +14,6 @@
       "image": "./assets/logo-bg.png",
       "resizeMode": "contain",
       "backgroundColor": "#FFF064"
-     
-
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -25,11 +23,16 @@
     ],
     "ios": {
       "supportsTablet": true
-    },"android": {
+    },
+    "android": {
       "package": "com.yourcompany.yourappname",
-      "versionCode": 1
-     
+      "versionCode": 1,
+      "config": {
+        "googleSignIn": {
+          "apiKey": "AIzaSyCJec-8VQVXNjMORK8IIPUiztZ7k2HVEOA",
+          "certificateHash": "9C0E886EB3FC0BD5592D5CA6F30A8122DEA3289D"
+        }
+      }
     }
-    
   }
 }

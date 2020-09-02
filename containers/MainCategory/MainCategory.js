@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, RefreshControl, SectionList, FlatList, ActivityIndicator, Button, Animated, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, RefreshControl, SectionList, FlatList, ActivityIndicator, Button, Animated,I18nManager, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
 import store from '../../store'
 import { connect } from 'react-redux'
 /* colors */
@@ -54,9 +54,9 @@ class MainCategory extends React.Component {
         // console.log(this.props.navigation.state.params.props);
         
         this.setState({ bestSellerProducts: this.props.bestsellerReducer }, (() => { this.setState({ isDataLoaded: true }) }))
-        this.setState({ categoryArr: this.props.navigation.state.params.props.item.Catygory }, (() => { this.setState({ isDataLoaded: true }) ; console.log(this.state.categoryArr)        }))
+        this.setState({ categoryArr: this.props.navigation.state.params.props.item.Catygory }, (() => { this.setState({ isDataLoaded: true })  }))
 
-
+console.log(this.props.navigation.state.params.props.item.nameEN);
     }
     componentWillUnmount() {
         this.unsubscribe();
@@ -118,7 +118,7 @@ class MainCategory extends React.Component {
                         <Text style={{
                             fontFamily: 'Cairo-Regular',
                             fontSize: 20,
-                        }}>{this.props.navigation.state.params.title}</Text>
+                        }}>{I18nManager.isRTL ? this.props.navigation.state.params.props.item.nameAR:this.props.navigation.state.params.props.item.nameEN}</Text>
                     </View>
                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                         <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingLeft: 30, width: "70%" }}
@@ -173,8 +173,8 @@ class MainCategory extends React.Component {
                                 showsVerticalScrollIndicator={false}
                                 contentContainerStyle={styles.grid}
                                 sections={[
-                                    { title: "DISCOVER", data: this.state.categoryArr },
-                                    { title: "NEWEST ARRIVAL", data: this.state.bestSellerProducts },]}
+                                    { title: I18nManager.isRTL ? "إكتشف" : "DISCOVER", data: this.state.categoryArr },
+                                    { title: I18nManager.isRTL ? "الاحدث" : "NEWEST ARRIVAL", data: this.state.bestSellerProducts },]}
                                 renderSectionHeader={({ section: { title } }) => (
                                     <View style={styles.textView}>
                                         <Text style={styles.titleText}>{title}</Text>

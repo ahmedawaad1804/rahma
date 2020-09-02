@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, CheckBox, TouchableHighlight, Button, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, CheckBox, I18nManager, Button, Input, ScrollView, TouchableOpacity, Image, TextInput, Dimensions, KeyboardAvoidingView, ImageBackground } from 'react-native';
 import store from '../../store'
 import { connect } from 'react-redux'
 /* colors */
@@ -15,7 +15,7 @@ export default CategoryItem = (data) => {
     <View>
       <TouchableOpacity style={styles.gridCell} onPress={data.click} >
         <Image style={styles.imageThumbnail} source={{uri:`http://www.beemallshop.com/img/CatIcons/${data.src.icon}`}} />
-        <Text style={styles.smallText}>{data.src.nameEN}</Text>
+        <Text style={styles.smallText}>{ I18nManager.isRTL ?data.src.nameAR:data.src.nameEN}</Text>
         <View style={{ backgroundColor: '#ccc', height: Dimensions.get('window').height * 12 / 812 }}></View>
       </TouchableOpacity>
     </View>
